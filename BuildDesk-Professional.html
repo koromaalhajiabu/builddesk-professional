@@ -106,19 +106,8 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
 <div class="stat"><small>Estimated gross margin on sales*</small><strong id="repMargin">SLE 0.00</strong></div>
 </div><p class="muted">*Prototype estimate using the product's current unit cost; not an audited profit/loss or inventory valuation. Returns, tax, expenses, and cost changes are not fully modelled.</p>
 </section>
-<section id="backup" class="panel"><h2>Backup / Export</h2><p>Export a JSON copy of the prototype's local data. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn">Download JSON backup</button><button class="btn secondary" id="checkBtn">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><p class="muted">This is an export only. A tested restore workflow and encrypted cloud backup are not included in this starter.</p></section>
- 
-<section class="stat" style="margin-top:12px">
-  <h3>Restore from JSON backup</h3>
-  <p class="muted">Choose a BuildDesk JSON backup file. Restoring will replace the current products, sales, and purchases on this device.</p>
-  <div class="field">
-    <label for="restoreFile">Select JSON backup file</label>
-    <input id="restoreFile" type="file" accept=".json,application/json">
-  </div>
-  <button class="btn secondary" id="restoreBtn" type="button">Restore backup</button>
-  <p id="restoreStatus" class="muted" aria-live="polite"></p>
-</section>
-
+<section id="backup" class="panel"><h2>Backup / Restore</h2><p>Export a JSON copy of this device's products, sales, and purchases. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn" type="button">Download JSON backup</button><button class="btn secondary" id="checkBtn" type="button">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><section class="stat" style="margin-top:12px"><h3>Restore from JSON backup</h3><p class="muted">Choose a BuildDesk JSON backup file. Restoring replaces the current products, sales, and purchases on this device. Staff accounts and shop settings are not changed.</p><div class="field"><label for="restoreFile">Select JSON backup file</label><input id="restoreFile" type="file" accept=".json,application/json"></div><button class="btn secondary" id="restoreBtn" type="button">Restore backup</button><p id="restoreStatus" class="muted" aria-live="polite"></p></section></section>
+<section id="administrator" class="panel"><h2>Administrator dashboard</h2>
 <p class="muted">Manage your shop identity, staff access, and administrator password. Changes are saved in this browser on this device.</p>
 <form id="shopSettingsForm" class="stat" style="margin-bottom:16px"><h3 style="margin-top:0">Shop name and business identity</h3><div class="field"><label for="shopNameInput">Shop / business name</label><input id="shopNameInput" maxlength="80" required placeholder="e.g. Abu Koroma Building Materials & Hardware"></div><p class="muted">This name appears at the top of the app and on printed receipts. It does not change your saved sales or product records.</p><button class="btn" type="submit">Save shop name</button><p id="shopNameStatus" class="muted" aria-live="polite"></p></form>
 <div class="grid"><div class="stat"><small>Signed-in account</small><strong id="currentAccount" style="font-size:18px">admin</strong></div><div class="stat"><small>Staff accounts</small><strong id="staffCount">0</strong></div></div>
@@ -203,7 +192,7 @@ function printReceipt(receiptId){
  <div class="line"><span>Unit price</span><span>${money(s.price)}</span></div>
  <div class="line total"><span>TOTAL</span><span>${money(s.total)}</span></div>
  <div class="foot">Thank you for your business.<br>Prototype receipt — verify all details before use.</div>
- <script>window.onload=()=>{};<\/script>
+
 </body></html>`);
  w.document.close();w.focus();
 }
@@ -215,6 +204,28 @@ document.getElementById('purchaseForm').addEventListener('submit',e=>{e.preventD
 document.getElementById('sProduct').addEventListener('change',updatePreview);document.getElementById('sQty').addEventListener('input',updatePreview);
 document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'BuildDesk Professional Starter',exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='BuildDesk-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);document.getElementById('backupStatus').textContent='Backup export requested. Check Downloads and confirm the file is non-empty.';});
 document.getElementById('checkBtn').addEventListener('click',()=>{document.getElementById('backupStatus').textContent=`Local data check: ${state.products.length} products, ${state.sales.length} sales, ${state.purchases.length} purchases. This checks the current browser data only.`;});
+
+document.getElementById('restoreBtn').addEventListener('click',()=>{
+ const file=document.getElementById('restoreFile').files[0];
+ const status=document.getElementById('restoreStatus');
+ if(!file){status.textContent='Please select a BuildDesk JSON backup file first.';return;}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const backup=JSON.parse(String(reader.result||''));
+   const data=backup&&backup.data;
+   if(!data||!Array.isArray(data.products)||!Array.isArray(data.sales)||!Array.isArray(data.purchases)){
+    status.textContent='This file is not a valid BuildDesk backup. No data was changed.';return;
+   }
+   if(!confirm('Restore this backup? Current products, sales, and purchases on this device will be replaced. Staff accounts and shop settings will not change.'))return;
+   state={products:data.products,sales:data.sales,purchases:data.purchases};
+   save();
+   status.textContent='Backup restored successfully. Products: '+state.products.length+', sales: '+state.sales.length+', purchases: '+state.purchases.length+'.';
+  }catch(err){status.textContent='Could not read this backup file. No data was changed.';}
+ };
+ reader.onerror=()=>{status.textContent='Could not read the selected file. No data was changed.';};
+ reader.readAsText(file);
+});
 
 document.getElementById('shopSettingsForm').addEventListener('submit',e=>{e.preventDefault();if(!currentUser||currentUser.role!=='admin')return;const name=document.getElementById('shopNameInput').value.trim();if(!name){document.getElementById('shopNameStatus').textContent='Enter a shop name first.';return;}settings.shopName=name;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));applyShopName();document.getElementById('shopNameStatus').textContent='Shop name saved and applied to the app and receipts.';});
 document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const username=document.getElementById('loginUser').value.trim();const password=document.getElementById('loginPass').value;const user=auth.users.find(u=>u.username.toLowerCase()===username.toLowerCase());if(!user||user.passwordHash!==await passwordHash(password)){document.getElementById('loginError').textContent='Incorrect username or password. Please try again.';return;}document.getElementById('loginError').textContent='';showApp(user);if(user.mustChangePassword){activateTab('administrator');document.getElementById('passwordStatus').textContent='Please change the temporary administrator password now.';}});
