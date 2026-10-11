@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123d72">
+<title>BuildDesk Professional</title>
+<style>
+:root{--navy:#123d72;--blue:#1769aa;--gold:#f5b323;--bg:#f3f6fb;--ink:#172b4d;--muted:#63748b;--line:#dbe4ef;--green:#16804a}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#0b2d54,#1769aa);color:white;padding:20px 16px}
+.brand{display:flex;gap:12px;align-items:center;max-width:1100px;margin:auto}.logo{font-size:30px;background:var(--gold);color:#123d72;border-radius:12px;padding:8px 12px;font-weight:900}.brand h1{margin:0;font-size:24px}.brand p{margin:3px 0 0;color:#dbeafe;font-size:13px}
+main{max-width:1100px;margin:18px auto;padding:0 14px 32px}.notice{background:#fff7df;border:1px solid #f2d27c;padding:12px 14px;border-radius:12px;font-size:13px;margin-bottom:16px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:3px 0 12px}.tabs button{white-space:nowrap;border:1px solid var(--line);background:#fff;padding:10px 13px;border-radius:10px;color:var(--ink);font-weight:700}.tabs button.active{background:var(--navy);color:white;border-color:var(--navy)}
+.panel{display:none;background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 18px #16345a0b}.panel.active{display:block}.panel h2{margin:0 0 14px;font-size:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.stat{border:1px solid var(--line);border-radius:12px;padding:14px}.stat small{display:block;color:var(--muted);margin-bottom:7px}.stat strong{font-size:24px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-weight:700;font-size:13px}.field input,.field select{border:1px solid #cbd7e6;border-radius:9px;padding:11px;font:inherit;width:100%;background:#fff}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.btn{border:0;border-radius:9px;padding:11px 14px;font-weight:800;cursor:pointer;background:var(--blue);color:white}.btn.secondary{background:#e9f1fb;color:var(--navy)}.btn.danger{background:#b42318}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.tablewrap{overflow:auto;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:560px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px;font-size:13px}th{color:var(--muted);background:#f8fafc}.muted{color:var(--muted);font-size:13px}.pill{display:inline-block;border-radius:999px;background:#e7f7ee;color:#11683b;padding:3px 8px;font-size:11px;font-weight:800}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
+@media(max-width:600px){.brand h1{font-size:20px}.panel{padding:13px}.stat strong{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">BD</div><div><h1>BuildDesk <span style="color:#ffc83d">Professional</span></h1><p>Building materials & hardware shop management</p></div></div></header>
+<main>
+<div class="notice"><strong>Starter test build:</strong> This is a local prototype for fictional data only. Data is stored in this browser on this device. It is not yet secure cloud software; do not use real customer or business records.</div>
+<div class="tabs" id="tabs">
+<button class="active" data-tab="dashboard">Dashboard</button><button data-tab="products">Stock / Products</button><button data-tab="sales">Sales & Receipts</button><button data-tab="purchases">Purchases</button><button data-tab="customers">Customer Credit</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup</button>
+</div>
+<section id="dashboard" class="panel active">
+<h2>Business overview</h2><div class="grid">
+<div class="stat"><small>Today's recorded sales</small><strong id="dashSales">SLE 0.00</strong></div>
+<div class="stat"><small>Products in catalogue</small><strong id="dashProducts">0</strong></div>
+<div class="stat"><small>Low-stock items</small><strong id="dashLow">0</strong></div>
+<div class="stat"><small>Outstanding customer credit</small><strong id="dashCredit">SLE 0.00</strong></div>
+</div><p class="muted">Use the tabs to add test products, record a sale, enter purchases, and inspect your local backup.</p>
+</section>
+<section id="products" class="panel"><h2>Stock / Products</h2>
+<form id="productForm"><div class="formgrid">
+<div class="field"><label>Product name</label><input id="pName" required placeholder="e.g. Cement 50kg"></div>
+<div class="field"><label>Category</label><input id="pCategory" placeholder="e.g. Cement"></div>
+<div class="field"><label>Unit</label><select id="pUnit"><option>bag</option><option>piece</option><option>length</option><option>sheet</option><option>tin</option><option>box</option><option>kg</option><option>litre</option><option>other</option></select></div>
+<div class="field"><label>Cost per unit (SLE)</label><input id="pCost" type="number" min="0" step="0.01" required></div>
+<div class="field"><label>Selling price (SLE)</label><input id="pPrice" type="number" min="0" step="0.01" required></div>
+<div class="field"><label>Opening stock quantity</label><input id="pQty" type="number" min="0" step="0.01" required></div>
+<div class="field"><label>Low-stock alert threshold</label><input id="pMin" type="number" min="0" step="0.01" value="5"></div>
+</div><button class="btn">Add product</button></form>
+<div class="tablewrap"><table><thead><tr><th>Product</th><th>Unit</th><th>Cost</th><th>Price</th><th>In stock</th><th>Status</th></tr></thead><tbody id="productRows"></tbody></table></div>
+</section>
+<section id="sales" class="panel"><h2>Record a sale</h2>
+<form id="saleForm"><div class="formgrid">
+<div class="field"><label>Product</label><select id="sProduct" required></select></div>
+<div class="field"><label>Quantity</label><input id="sQty" type="number" min="0.01" step="0.01" required value="1"></div>
+<div class="field"><label>Payment type</label><select id="sPayment"><option>Cash</option><option>Credit</option><option>Mobile money</option><option>Bank transfer</option></select></div>
+<div class="field"><label>Customer (optional)</label><input id="sCustomer" placeholder="Fictional customer"></div>
+</div><p class="muted" id="salePreview">Choose a product to see the total.</p><button class="btn">Save test sale</button></form>
+<div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Receipt</th><th>Product</th><th>Qty</th><th>Total</th><th>Payment</th></tr></thead><tbody id="saleRows"></tbody></table></div>
+</section>
+<section id="purchases" class="panel"><h2>Record a purchase / stock receipt</h2>
+<form id="purchaseForm"><div class="formgrid">
+<div class="field"><label>Product</label><select id="buyProduct" required></select></div>
+<div class="field"><label>Quantity received</label><input id="buyQty" type="number" min="0.01" step="0.01" required></div>
+<div class="field"><label>Supplier</label><input id="buySupplier" required placeholder="Fictional supplier"></div>
+<div class="field"><label>Unit cost (SLE)</label><input id="buyCost" type="number" min="0" step="0.01" required></div>
+</div><button class="btn">Record purchase</button></form>
+<div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Product</th><th>Qty</th><th>Supplier</th><th>Total cost</th></tr></thead><tbody id="purchaseRows"></tbody></table></div>
+</section>
+<section id="customers" class="panel"><h2>Customer credit</h2><p class="muted">Credit sales are tracked from sales marked “Credit”. This starter does not yet include repayments or customer account statements.</p>
+<div class="tablewrap"><table><thead><tr><th>Customer</th><th>Receipt</th><th>Product</th><th>Outstanding</th></tr></thead><tbody id="creditRows"></tbody></table></div>
+</section>
+<section id="reports" class="panel"><h2>Basic reports</h2><div class="grid">
+<div class="stat"><small>Total recorded sales</small><strong id="repSales">SLE 0.00</strong></div>
+<div class="stat"><small>Recorded purchase cost</small><strong id="repPurchases">SLE 0.00</strong></div>
+<div class="stat"><small>Estimated gross margin on sales*</small><strong id="repMargin">SLE 0.00</strong></div>
+</div><p class="muted">*Prototype estimate using the product's current unit cost; not an audited profit/loss or inventory valuation. Returns, tax, expenses, and cost changes are not fully modelled.</p>
+</section>
+<section id="backup" class="panel"><h2>Backup / Export</h2><p>Export a JSON copy of the prototype's local data. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn">Download JSON backup</button><button class="btn secondary" id="checkBtn">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><p class="muted">This is an export only. A tested restore workflow and encrypted cloud backup are not included in this starter.</p></section>
+</main>
+<footer>BuildDesk Professional · Starter prototype · Use fictional data only</footer>
+<script>
+const KEY='builddesk_professional_starter_v1';
+let state={products:[],sales:[],purchases:[]};
+const money=n=>'SLE '+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.products)&&Array.isArray(parsed.sales)&&Array.isArray(parsed.purchases))state=parsed;}}catch(e){}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
+function dt(){return new Date().toLocaleString();}
+function fillSelects(){const opts=state.products.map(p=>`<option value="${p.id}">${esc(p.name)} (${p.qty} ${esc(p.unit)} available)</option>`).join('');['sProduct','buyProduct'].forEach(id=>{const el=document.getElementById(id);const old=el.value;el.innerHTML=opts||'<option value="">Add a product first</option>';if(state.products.some(p=>p.id===old))el.value=old;});}
+function render(){
+document.getElementById('dashSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
+document.getElementById('dashProducts').textContent=state.products.length;
+document.getElementById('dashLow').textContent=state.products.filter(p=>p.qty<=p.min).length;
+document.getElementById('dashCredit').textContent=money(state.sales.filter(s=>s.payment==='Credit').reduce((a,s)=>a+s.total,0));
+document.getElementById('productRows').innerHTML=state.products.map(p=>`<tr><td>${esc(p.name)}<br><span class="muted">${esc(p.category)}</span></td><td>${esc(p.unit)}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td>${p.qty}</td><td>${p.qty<=p.min?'<span style="color:#b42318;font-weight:700">Low stock</span>':'<span class="pill">In stock</span>'}</td></tr>`).join('')||'<tr><td colspan="6">No products yet. Add a fictional product to begin.</td></tr>';
+document.getElementById('saleRows').innerHTML=[...state.sales].reverse().map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${esc(s.payment)}</td></tr>`).join('')||'<tr><td colspan="6">No sales recorded yet.</td></tr>';
+document.getElementById('purchaseRows').innerHTML=[...state.purchases].reverse().map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.productName)}</td><td>${p.qty}</td><td>${esc(p.supplier)}</td><td>${money(p.total)}</td></tr>`).join('')||'<tr><td colspan="5">No purchases recorded yet.</td></tr>';
+document.getElementById('creditRows').innerHTML=state.sales.filter(s=>s.payment==='Credit').map(s=>`<tr><td>${esc(s.customer||'Unspecified customer')}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${money(s.total)}</td></tr>`).join('')||'<tr><td colspan="4">No credit sales recorded.</td></tr>';
+document.getElementById('repSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
+document.getElementById('repPurchases').textContent=money(state.purchases.reduce((a,p)=>a+p.total,0));
+document.getElementById('repMargin').textContent=money(state.sales.reduce((a,s)=>a+(s.price-s.cost)*s.qty,0));
+fillSelects();updatePreview();
+}
+function updatePreview(){const p=state.products.find(x=>x.id===document.getElementById('sProduct').value);const q=Number(document.getElementById('sQty').value||0);document.getElementById('salePreview').textContent=p?`Total: ${money(p.price*q)} · Available: ${p.qty} ${p.unit}`:'Add a product first.';}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));}));
+document.getElementById('productForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('pName').value.trim();if(!name)return;state.products.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,category:document.getElementById('pCategory').value.trim(),unit:document.getElementById('pUnit').value,cost:Number(document.getElementById('pCost').value),price:Number(document.getElementById('pPrice').value),qty:Number(document.getElementById('pQty').value),min:Number(document.getElementById('pMin').value||0)});e.target.reset();document.getElementById('pMin').value=5;save();});
+document.getElementById('saleForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('sProduct').value),qty=Number(document.getElementById('sQty').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}if(qty>p.qty){alert('Not enough stock for this sale.');return;}const s={date:dt(),receipt:'BD-'+Date.now().toString().slice(-8),productId:p.id,productName:p.name,qty,price:p.price,cost:p.cost,total:qty*p.price,payment:document.getElementById('sPayment').value,customer:document.getElementById('sCustomer').value.trim()};p.qty-=qty;state.sales.push(s);alert(`Sale recorded. Receipt ${s.receipt}\\nTotal: ${money(s.total)}\\nPrototype receipt only.`);e.target.reset();document.getElementById('sQty').value=1;save();});
+document.getElementById('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('buyProduct').value),qty=Number(document.getElementById('buyQty').value),cost=Number(document.getElementById('buyCost').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}p.qty+=qty;p.cost=cost;state.purchases.push({date:dt(),productId:p.id,productName:p.name,qty,supplier:document.getElementById('buySupplier').value.trim(),unitCost:cost,total:qty*cost});e.target.reset();save();});
+document.getElementById('sProduct').addEventListener('change',updatePreview);document.getElementById('sQty').addEventListener('input',updatePreview);
+document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'BuildDesk Professional Starter',exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='BuildDesk-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);document.getElementById('backupStatus').textContent='Backup export requested. Check Downloads and confirm the file is non-empty.';});
+document.getElementById('checkBtn').addEventListener('click',()=>{document.getElementById('backupStatus').textContent=`Local data check: ${state.products.length} products, ${state.sales.length} sales, ${state.purchases.length} purchases. This checks the current browser data only.`;});
+load();render();
+</script>
+</body></html>
