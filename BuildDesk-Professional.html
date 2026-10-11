@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#123d72">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+
 <title>BuildDesk Professional</title>
 <style>
 :root{--navy:#123d72;--blue:#1769aa;--gold:#f5b323;--bg:#f3f6fb;--ink:#172b4d;--muted:#63748b;--line:#dbe4ef;--green:#16804a}
@@ -187,7 +192,13 @@ function printReceipt(receiptId){
  <div class="line"><span>Unit price</span><span>${money(s.price)}</span></div>
  <div class="line total"><span>TOTAL</span><span>${money(s.total)}</span></div>
  <div class="foot">Thank you for your business.<br>Prototype receipt — verify all details before use.</div>
- <script>window.onload=()=>{};<\/script></body></html>`);
+ <script>window.onload=()=>{};<\/script>
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline support registration failed:', err)));
+}
+</script>
+</body></html>`);
  w.document.close();w.focus();
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='administrator'&&(!currentUser||currentUser.role!=='admin'))return;activateTab(b.dataset.tab);}));
@@ -206,5 +217,11 @@ document.getElementById('passwordForm').addEventListener('submit',async e=>{e.pr
 document.getElementById('staffForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser||currentUser.role!=='admin')return;const username=document.getElementById('staffUsername').value.trim(),password=document.getElementById('staffPassword').value;if(username.length<3){document.getElementById('staffStatus').textContent='Username must be at least 3 characters.';return;}if(password.length<4){document.getElementById('staffStatus').textContent='Password must be at least 4 characters.';return;}if(auth.users.some(u=>u.username.toLowerCase()===username.toLowerCase())){document.getElementById('staffStatus').textContent='That username already exists.';return;}auth.users.push({username,role:'staff',passwordHash:await passwordHash(password),mustChangePassword:true});persistAuth();e.target.reset();document.getElementById('staffStatus').textContent='Staff account created. Share the login details privately.';renderAdmin();});
 document.getElementById('staffRows').addEventListener('click',e=>{const b=e.target.closest('[data-delete-user]');if(!b||!currentUser||currentUser.role!=='admin')return;const username=b.dataset.deleteUser;if(!confirm('Delete staff account '+username+'?'))return;auth.users=auth.users.filter(u=>!(u.username===username&&u.role==='staff'));persistAuth();renderAdmin();});
 (async()=>{loadSettings();await initAuth();load();render();logout();})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline support registration failed:', err)));
+}
 </script>
 </body></html>

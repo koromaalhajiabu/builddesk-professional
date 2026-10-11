@@ -1,30 +1,20 @@
-BuildDesk Professional — Starter Prototype
-============================================
+BuildDesk Professional — Installable Offline Web App
 
-This is an early, local-only prototype for Android/browser testing.
+Files included:
+- index.html: website entry point
+- BuildDesk-Professional.html: main app
+- manifest.webmanifest: app name, icon and installation settings
+- service-worker.js: caches the app shell for offline reopening
+- icons/: Android app icons
 
-Files:
-- BuildDesk-Professional.html: open this file in a browser.
-- README.txt: this guide.
+DEPLOYMENT
+Upload all files and the icons folder to the ROOT of the existing GitHub repository used by Render. Keep the existing repository and Render site. Ensure the Render publish directory is the repository root (.). Commit the new/updated files and wait for deployment to become Live.
 
-Safe test steps:
-1. Extract the ZIP to a folder on your Android phone.
-2. Open BuildDesk-Professional.html in Chrome or another browser.
-3. Add a fictional product (example: Cement 50kg, cost SLE 100, price SLE 130, stock 20).
-4. Record a small fictional sale and verify the stock decreases.
-5. Open Backup and download a JSON backup.
-6. Do not use real customer or business records.
+INSTALL ON ANDROID
+1. Open the HTTPS Render website in Chrome while connected to the internet.
+2. Allow it to finish loading once so the offline files can be cached.
+3. Open Chrome menu (three dots) and choose “Install app” or “Add to Home screen” if shown.
+4. Launch BuildDesk from the new home-screen icon. Test offline by turning off mobile data/Wi-Fi after the first successful load.
 
-Important limitations:
-- Records are stored in localStorage in the browser on this device.
-- No online database, secure account system, cross-device sync, tested restore, or service-worker offline installation is included yet.
-- This is not production-ready accounting software. Reports are basic estimates and are not audited profit/loss.
-- Do not use it for real business records or claim secure online/offline syncing until those features are built and tested.
-
-Next development stages:
-1. Validate core workflows with fictional data.
-2. Add proper authentication, roles and audit logs.
-3. Build secure backend with separate business tenants and encrypted transport.
-4. Add tested export/restore, backup policy and offline sync conflict handling.
-5. Add PWA manifest/service worker and test hosted offline behavior.
-6. Add receipts/printing and more complete stock, credit, and accounting workflows.
+DATA NOTE
+Business data is stored in browser localStorage. The installed website and a separately opened downloaded HTML file may use different storage. Keep regular backups. This browser-based prototype is not strong security for sensitive records.
