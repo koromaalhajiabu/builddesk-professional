@@ -193,11 +193,7 @@ function printReceipt(receiptId){
  <div class="line total"><span>TOTAL</span><span>${money(s.total)}</span></div>
  <div class="foot">Thank you for your business.<br>Prototype receipt — verify all details before use.</div>
  <script>window.onload=()=>{};<\/script>
-<script>
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline support registration failed:', err)));
-}
-</script>
+
 </body></html>`);
  w.document.close();w.focus();
 }
