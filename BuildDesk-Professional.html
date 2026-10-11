@@ -107,7 +107,18 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
 </div><p class="muted">*Prototype estimate using the product's current unit cost; not an audited profit/loss or inventory valuation. Returns, tax, expenses, and cost changes are not fully modelled.</p>
 </section>
 <section id="backup" class="panel"><h2>Backup / Export</h2><p>Export a JSON copy of the prototype's local data. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn">Download JSON backup</button><button class="btn secondary" id="checkBtn">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><p class="muted">This is an export only. A tested restore workflow and encrypted cloud backup are not included in this starter.</p></section>
-<section id="administrator" class="panel"><h2>Administrator dashboard</h2>
+ 
+<section class="stat" style="margin-top:12px">
+  <h3>Restore from JSON backup</h3>
+  <p class="muted">Choose a BuildDesk JSON backup file. Restoring will replace the current products, sales, and purchases on this device.</p>
+  <div class="field">
+    <label for="restoreFile">Select JSON backup file</label>
+    <input id="restoreFile" type="file" accept=".json,application/json">
+  </div>
+  <button class="btn secondary" id="restoreBtn" type="button">Restore backup</button>
+  <p id="restoreStatus" class="muted" aria-live="polite"></p>
+</section>
+
 <p class="muted">Manage your shop identity, staff access, and administrator password. Changes are saved in this browser on this device.</p>
 <form id="shopSettingsForm" class="stat" style="margin-bottom:16px"><h3 style="margin-top:0">Shop name and business identity</h3><div class="field"><label for="shopNameInput">Shop / business name</label><input id="shopNameInput" maxlength="80" required placeholder="e.g. Abu Koroma Building Materials & Hardware"></div><p class="muted">This name appears at the top of the app and on printed receipts. It does not change your saved sales or product records.</p><button class="btn" type="submit">Save shop name</button><p id="shopNameStatus" class="muted" aria-live="polite"></p></form>
 <div class="grid"><div class="stat"><small>Signed-in account</small><strong id="currentAccount" style="font-size:18px">admin</strong></div><div class="stat"><small>Staff accounts</small><strong id="staffCount">0</strong></div></div>
