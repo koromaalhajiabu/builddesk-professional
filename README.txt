@@ -2,7 +2,7 @@ BuildDesk Professional — Installable Offline Web App
 
 Files included:
 - index.html: website entry point
-- BuildDesk-Professional.html: main app
+- index.html: main app (the page users open and install)
 - manifest.webmanifest: app name, icon and installation settings
 - service-worker.js: caches the app shell for offline reopening
 - icons/: Android app icons

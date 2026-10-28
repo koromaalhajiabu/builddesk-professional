@@ -1,8 +1,7 @@
-const CACHE_NAME = 'builddesk-professional-v5';
+const CACHE_NAME = 'builddesk-professional-v6';
 const APP_SHELL = [
   './',
   './index.html',
-  './BuildDesk-Professional.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png'
@@ -23,6 +22,6 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
       }
       return response;
-    }).catch(() => caches.match('./BuildDesk-Professional.html'));
+    }).catch(() => caches.match('./index.html'));
   }));
 });

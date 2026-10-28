@@ -1,9 +1,9 @@
 {
-  "id": "./BuildDesk-Professional.html",
+  "id": "./index.html",
   "name": "BuildDesk Professional",
   "short_name": "BuildDesk",
   "description": "Offline building materials and hardware shop management system.",
-  "start_url": "./BuildDesk-Professional.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
