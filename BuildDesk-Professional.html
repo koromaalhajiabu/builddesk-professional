@@ -168,17 +168,18 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 </head>
 <body>
 <header><div class="brand"><div class="logo" id="brandLogo">BD</div><div><h1 id="brandShopName">BuildDesk Professional</h1><p>Building materials &amp; hardware shop management</p></div></div></header>
-<div class="top-actions"><button class="btn small" id="logoutBtn" type="button">Log out</button></div>
+<div class="top-actions"><button class="btn small secondary" id="pwBtn" type="button" style="margin-right:8px">Change password</button><button class="btn small" id="logoutBtn" type="button">Log out</button></div>
 <section id="loginScreen" class="auth-wrap">
  <div class="auth-card"><h2>Sign in to BuildDesk</h2><p class="muted">Log in with an administrator or staff account to continue. This login works offline on this device.</p>
  <form id="loginForm"><div class="field"><label for="loginUser">Username</label><input id="loginUser" name="username" autocomplete="username" required value=""></div>
  <div class="field"><label for="loginPass">Password</label><input id="loginPass" name="password" type="password" autocomplete="current-password" required></div>
  <button class="btn" type="submit">Log in</button><p id="loginError" class="auth-error" aria-live="polite"></p></form>
- <p class="muted"><strong>First-time setup:</strong> username <code>admin</code>, temporary password <code>1234</code>. Change this password in Administrator after signing in.</p>
- <p class="muted">Security note: this is a local, browser-based prototype. It is not suitable for protecting sensitive business records against someone with access to this device or its browser storage.</p></div>
+ <p class="muted"><strong>First-time setup:</strong> username <code>admin</code>, temporary password <code>1234</code>. You will be asked to choose a new password when you first sign in.</p>
+ <p class="muted">Pilot note: records are kept in this browser on this device. Anyone with access to this device or browser can see them.</p></div>
 </section>
 <main id="appMain" class="hidden">
-<div class="notice"><strong>Starter test build:</strong> This is a local prototype for fictional data only. Data is stored in this browser on this device. It is not yet secure cloud software; do not use real customer or business records.</div>
+<div class="notice"><strong>Pilot version:</strong> Your records are stored on this device only. Download a backup from the Backup tab every week and keep it safe. If the browser data is cleared, the records cannot be recovered without a backup.</div>
+<div class="notice hidden" id="backupReminder"></div>
 <div class="tabs" id="tabs">
 <button class="active" data-tab="dashboard">Dashboard</button><button data-tab="products">Stock / Products</button><button data-tab="suppliers">Suppliers</button><button data-tab="sales">Sales &amp; Receipts</button><button data-tab="purchases">Purchases</button><button data-tab="activity">Activity</button><button data-tab="customers">Customer Credit</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup</button><button data-tab="administrator" id="adminTab" class="hidden">Administrator</button>
 </div>
@@ -270,6 +271,10 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 <div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Type</th><th>Item</th><th>Qty change</th><th>Details</th></tr></thead><tbody id="activityRows"></tbody></table></div>
 </section>
 
+<section id="accountPw" class="panel"><h2 id="pwTitle">Change your password</h2>
+<p class="muted" id="pwIntro"></p>
+<form id="accountPwForm" class="stat" style="margin-top:14px;max-width:460px"><div class="field"><label for="acOld">Current password</label><input id="acOld" type="password" autocomplete="current-password" required></div><div class="field"><label for="acNew">New password (at least 4 characters)</label><input id="acNew" type="password" minlength="4" autocomplete="new-password" required></div><div class="field"><label for="acConfirm">Confirm new password</label><input id="acConfirm" type="password" minlength="4" autocomplete="new-password" required></div><button class="btn" type="submit">Save new password</button><p id="accountPwStatus" class="muted" aria-live="polite"></p></form>
+</section>
 <section id="customers" class="panel"><h2>Customer credit</h2><p class="muted">Credit sales are tracked from sales marked “Credit”. This starter does not yet include repayments or customer account statements.</p>
 <div class="tablewrap"><table><thead><tr><th>Customer</th><th>Receipt</th><th>Product</th><th>Outstanding</th></tr></thead><tbody id="creditRows"></tbody></table></div>
 </section>
@@ -281,7 +286,8 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 </div><p class="muted">*Prototype estimate using the product's current unit cost; not an audited profit/loss or inventory valuation. Returns, tax, expenses, and cost changes are not fully modelled.</p>
 </section>
 
-<section id="backup" class="panel"><h2>Backup / Restore</h2><p>Export a JSON copy of this device's products, suppliers, sales, purchases, and stock adjustments. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn" type="button">Download JSON backup</button><button class="btn secondary" id="checkBtn" type="button">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><section class="stat" style="margin-top:12px"><h3>Restore from JSON backup</h3><p class="muted">Choose a BuildDesk JSON backup file. Restoring replaces the current products, suppliers, sales, purchases, and adjustments on this device. Staff accounts and shop settings are not changed.</p><div class="field"><label for="restoreFile">Select JSON backup file</label><input id="restoreFile" type="file" accept=".json,application/json"></div><button class="btn secondary" id="restoreBtn" type="button">Restore backup</button><p id="restoreStatus" class="muted" aria-live="polite"></p></section></section>
+<section id="backup" class="panel"><h2>Backup / Restore</h2><p>Export a JSON copy of this device's products, suppliers, sales, purchases, and stock adjustments. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn" type="button">Download JSON backup</button><button class="btn secondary" id="checkBtn" type="button">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><section class="stat" style="margin-top:12px"><h3>Restore from JSON backup</h3><p class="muted">Choose a BuildDesk JSON backup file. Restoring replaces the current products, suppliers, sales, purchases, and adjustments on this device. Staff accounts and shop settings are not changed.</p><div class="field"><label for="restoreFile">Select JSON backup file</label><input id="restoreFile" type="file" accept=".json,application/json"></div><button class="btn secondary" id="restoreBtn" type="button">Restore backup</button><p id="restoreStatus" class="muted" aria-live="polite"></p></section>
+<section class="stat" style="margin-top:12px"><h3>About this pilot</h3><p class="muted">Records live only in this browser on this device, not in a cloud service. Clearing browser data or uninstalling the app can delete them. Keep regular backups. This pilot does not replace accounting, tax, or legal records.</p></section></section></section>
 
 <section id="administrator" class="panel"><h2>Administrator dashboard</h2>
 <p class="muted">Manage your shop identity, staff access, and administrator password. Changes are saved in this browser on this device.</p>
@@ -304,6 +310,7 @@ let state={products:[],sales:[],purchases:[],suppliers:[],adjustments:[]};
 let auth={users:[]};
 let currentUser=null;
 let lowOnlyOn=false;
+let forcePwFlag=false;
 let activityFilter='all';
 const uid=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
 async function passwordHash(value){
@@ -320,9 +327,9 @@ async function initAuth(){
 function persistAuth(){localStorage.setItem(AUTH_KEY,JSON.stringify(auth));}
 function loadSettings(){try{const raw=localStorage.getItem(SETTINGS_KEY);if(raw){const parsed=JSON.parse(raw);if(parsed&&typeof parsed.shopName==='string'&&parsed.shopName.trim())settings.shopName=parsed.shopName.trim();}}catch(e){}applyShopName();}
 function applyShopName(){const name=settings.shopName||'BuildDesk Professional';document.getElementById('brandShopName').textContent=name;document.title=name+' | BuildDesk Professional';const input=document.getElementById('shopNameInput');if(input)input.value=name;}
-function showApp(user){currentUser=user;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appMain').classList.remove('hidden');document.getElementById('logoutBtn').style.display='inline-block';document.getElementById('adminTab').classList.toggle('hidden',user.role!=='admin');if(user.role!=='admin'&&document.getElementById('administrator').classList.contains('active'))activateTab('dashboard');renderAdmin();}
-function activateTab(id){document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));}
-function logout(){currentUser=null;document.getElementById('appMain').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('logoutBtn').style.display='none';document.getElementById('loginPass').value='';document.getElementById('loginError').textContent='';document.getElementById('loginUser').focus();}
+function showApp(user){currentUser=user;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appMain').classList.remove('hidden');document.getElementById('logoutBtn').style.display='inline-block';document.getElementById('pwBtn').style.display='inline-block';document.getElementById('adminTab').classList.toggle('hidden',user.role!=='admin');if(user.role!=='admin'&&document.getElementById('administrator').classList.contains('active'))activateTab('dashboard');renderAdmin();}
+function activateTab(id){if(forcePwFlag)return;document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));}
+function logout(){forcePwFlag=false;currentUser=null;document.getElementById('tabs').classList.remove('hidden');document.getElementById('appMain').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('logoutBtn').style.display='none';document.getElementById('pwBtn').style.display='none';document.getElementById('loginPass').value='';document.getElementById('loginError').textContent='';document.getElementById('loginUser').focus();}
 function renderAdmin(){if(!currentUser)return;document.getElementById('currentAccount').textContent=currentUser.username+' ('+currentUser.role+')';applyShopName();const staff=auth.users.filter(u=>u.role==='staff');document.getElementById('staffCount').textContent=staff.length;document.getElementById('staffRows').innerHTML=staff.map(u=>`<tr><td>${esc(u.username)}</td><td>Staff</td><td><button type="button" class="btn secondary small" data-delete-user="${esc(u.username)}">Delete</button></td></tr>`).join('')||'<tr><td colspan="3">No staff accounts created yet.</td></tr>';}
 
 const money=n=>'SLE '+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -390,7 +397,28 @@ function render(){
  document.getElementById('repMargin').textContent=money(state.sales.reduce((a,s)=>a+(s.price-s.cost)*s.qty,0));
  renderDashboardExtras();fillSelects();fillSupplierList();updatePreview();
 }
+function openAccountPw(forced){
+ forcePwFlag=forced;
+ document.getElementById('tabs').classList.toggle('hidden',forced);
+ document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='accountPw'));
+ document.getElementById('pwTitle').textContent=forced?'Choose your new password':'Change your password';
+ document.getElementById('pwIntro').textContent=forced?'This is your first sign-in. Enter the temporary password, then choose a new one to continue.':'Enter your current password and choose a new one.';
+ document.getElementById('accountPwStatus').textContent='';
+ document.getElementById('accountPwForm').reset();
+}
+function renderBackupReminder(){
+ const el=document.getElementById('backupReminder');
+ const last=Number(localStorage.getItem('builddesk_last_backup')||0);
+ const hasData=state.products.length||state.sales.length||state.purchases.length;
+ if(!hasData){el.classList.add('hidden');return;}
+ if(!last){el.textContent='You have not downloaded a backup yet. Open Backup and download one now.';el.classList.remove('hidden');return;}
+ const days=Math.floor((Date.now()-last)/86400000);
+ if(days>=7){el.textContent=`Your last backup was ${days} days ago. Download a fresh backup from the Backup tab.`;el.classList.remove('hidden');}
+ else el.classList.add('hidden');
+}
 function renderDashboardExtras(){
+ renderBackupReminder();
  const hour=new Date().getHours();
  const part=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
  const who=currentUser?`, <strong>${esc(currentUser.username)}</strong>`:'';
@@ -576,7 +604,7 @@ document.getElementById('saleRows').addEventListener('click',e=>{const b=e.targe
 
 document.getElementById('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('buyProduct').value),qty=Number(document.getElementById('buyQty').value),cost=Number(document.getElementById('buyCost').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}p.qty+=qty;p.cost=cost;state.purchases.push({ts:Date.now(),date:dt(),productId:p.id,productName:p.name,qty,supplier:document.getElementById('buySupplier').value.trim(),unitCost:cost,total:qty*cost});e.target.reset();save();});
 
-document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'BuildDesk Professional Starter',exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='BuildDesk-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);document.getElementById('backupStatus').textContent='Backup export requested. Check Downloads and confirm the file is non-empty.';});
+document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'BuildDesk Professional Starter',exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='BuildDesk-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);localStorage.setItem('builddesk_last_backup',String(Date.now()));renderBackupReminder();document.getElementById('backupStatus').textContent='Backup export requested. Check Downloads and confirm the file is non-empty.';});
 document.getElementById('checkBtn').addEventListener('click',()=>{document.getElementById('backupStatus').textContent=`Local data check: ${state.products.length} products, ${state.suppliers.length} suppliers, ${state.sales.length} sales, ${state.purchases.length} purchases, ${state.adjustments.length} adjustments. This checks the current browser data only.`;});
 
 document.getElementById('restoreBtn').addEventListener('click',()=>{
@@ -602,8 +630,25 @@ document.getElementById('restoreBtn').addEventListener('click',()=>{
 });
 
 document.getElementById('shopSettingsForm').addEventListener('submit',e=>{e.preventDefault();if(!currentUser||currentUser.role!=='admin')return;const name=document.getElementById('shopNameInput').value.trim();if(!name){document.getElementById('shopNameStatus').textContent='Enter a shop name first.';return;}settings.shopName=name;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));applyShopName();document.getElementById('shopNameStatus').textContent='Shop name saved and applied to the app and receipts.';});
-document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const username=document.getElementById('loginUser').value.trim();const password=document.getElementById('loginPass').value;const user=auth.users.find(u=>u.username.toLowerCase()===username.toLowerCase());if(!user||user.passwordHash!==await passwordHash(password)){document.getElementById('loginError').textContent='Incorrect username or password. Please try again.';return;}document.getElementById('loginError').textContent='';showApp(user);if(user.mustChangePassword){activateTab('administrator');document.getElementById('passwordStatus').textContent='Please change the temporary administrator password now.';}});
+document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const username=document.getElementById('loginUser').value.trim();const password=document.getElementById('loginPass').value;const user=auth.users.find(u=>u.username.toLowerCase()===username.toLowerCase());if(!user||user.passwordHash!==await passwordHash(password)){document.getElementById('loginError').textContent='Incorrect username or password. Please try again.';return;}document.getElementById('loginError').textContent='';showApp(user);if(user.mustChangePassword){openAccountPw(true);}});
 document.getElementById('logoutBtn').addEventListener('click',logout);
+document.getElementById('pwBtn').addEventListener('click',()=>openAccountPw(false));
+document.getElementById('accountPwForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!currentUser)return;
+ const st=document.getElementById('accountPwStatus');
+ const old=document.getElementById('acOld').value,n=document.getElementById('acNew').value,c=document.getElementById('acConfirm').value;
+ const user=auth.users.find(u=>u.username===currentUser.username);
+ if(!user||user.passwordHash!==await passwordHash(old)){st.textContent='Current password is incorrect.';return;}
+ if(n.length<4){st.textContent='Use at least 4 characters for the new password.';return;}
+ if(n!==c){st.textContent='The new passwords do not match.';return;}
+ if(n===old){st.textContent='Choose a password different from the current one.';return;}
+ user.passwordHash=await passwordHash(n);user.mustChangePassword=false;persistAuth();
+ e.target.reset();
+ forcePwFlag=false;
+ document.getElementById('tabs').classList.remove('hidden');
+ activateTab('dashboard');
+ alert('Password updated. Welcome to BuildDesk.');
+});
 document.getElementById('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser)return;const old=document.getElementById('oldPassword').value,newPass=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;const user=auth.users.find(u=>u.username===currentUser.username);if(!user||user.passwordHash!==await passwordHash(old)){document.getElementById('passwordStatus').textContent='Current password is incorrect.';return;}if(newPass.length<4){document.getElementById('passwordStatus').textContent='Use at least 4 characters for the new password.';return;}if(newPass!==confirm){document.getElementById('passwordStatus').textContent='The new passwords do not match.';return;}user.passwordHash=await passwordHash(newPass);user.mustChangePassword=false;persistAuth();document.getElementById('passwordForm').reset();document.getElementById('passwordStatus').textContent='Password updated successfully.';});
 document.getElementById('staffForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser||currentUser.role!=='admin')return;const username=document.getElementById('staffUsername').value.trim(),password=document.getElementById('staffPassword').value;if(username.length<3){document.getElementById('staffStatus').textContent='Username must be at least 3 characters.';return;}if(password.length<4){document.getElementById('staffStatus').textContent='Password must be at least 4 characters.';return;}if(auth.users.some(u=>u.username.toLowerCase()===username.toLowerCase())){document.getElementById('staffStatus').textContent='That username already exists.';return;}auth.users.push({username,role:'staff',passwordHash:await passwordHash(password),mustChangePassword:true});persistAuth();e.target.reset();document.getElementById('staffStatus').textContent='Staff account created. Share the login details privately.';renderAdmin();});
 document.getElementById('staffRows').addEventListener('click',e=>{const b=e.target.closest('[data-delete-user]');if(!b||!currentUser||currentUser.role!=='admin')return;const username=b.dataset.deleteUser;if(!confirm('Delete staff account '+username+'?'))return;auth.users=auth.users.filter(u=>!(u.username===username&&u.role==='staff'));persistAuth();renderAdmin();});
