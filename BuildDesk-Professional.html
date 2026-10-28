@@ -144,6 +144,23 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:26px;position
 code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-size:12.5px;color:#ffe08a}
 .top-actions{max-width:1100px;margin:0 auto;display:flex;justify-content:flex-end;padding:0 16px 10px;position:relative;z-index:2}
 .top-actions button{display:none}
+.greet{font-size:14px;color:var(--muted);margin:-2px 0 16px}
+.greet strong{color:#fff}
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:6px 0 4px}
+.chart-card{border:1px solid var(--line);border-radius:16px;padding:18px;background:rgba(7,11,23,.35)}
+.chart-card h3{margin:0 0 4px}
+.chart-card .muted{margin:0 0 10px}
+#salesChart svg{width:100%;height:auto;display:block;overflow:visible}
+.bar{transform-box:fill-box;transform-origin:50% 100%;animation:growUp .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes growUp{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.cat-row{display:grid;grid-template-columns:110px 1fr 110px;gap:10px;align-items:center;margin:10px 0;font-size:13px}
+.cat-name{color:#dfe7fa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-track{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.cat-fill{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ffd76a,#e0a526);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.cat-val{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.empty-chart{color:var(--muted);font-size:13px;padding:36px 0;text-align:center}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px;vertical-align:middle;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%{box-shadow:0 0 0 10px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
 .hidden{display:none!important}
 @media(max-width:600px){.brand h1{font-size:19px}.panel{padding:16px;border-radius:16px}.stat strong{font-size:22px}.logo{font-size:18px;padding:8px 11px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -167,13 +184,18 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 </div>
 
 <section id="dashboard" class="panel active">
-<h2>Business overview</h2><div class="grid">
+<h2>Business overview</h2><p class="greet" id="greet"></p><div class="grid">
 <div class="stat"><small>Today's recorded sales</small><strong id="dashSales">SLE 0.00</strong></div>
 <div class="stat"><small>Products in catalogue</small><strong id="dashProducts">0</strong></div>
 <div class="stat"><small>Low-stock items</small><strong id="dashLow">0</strong></div>
 <div class="stat"><small>Outstanding customer credit</small><strong id="dashCredit">SLE 0.00</strong></div>
+<div class="stat"><small>Stock value at cost</small><strong id="dashStock">SLE 0.00</strong></div>
 </div>
-<h3>Low-stock items</h3>
+<div class="chart-grid">
+<div class="chart-card"><h3>Sales, last 7 days</h3><p class="muted" id="salesTotal"></p><div id="salesChart"></div></div>
+<div class="chart-card"><h3>Stock value by category</h3><p class="muted">Quantity × unit cost, top 6 categories</p><div id="catBars"></div></div>
+</div>
+<h3><span class="pulse"></span>Low-stock items</h3>
 <div class="tablewrap"><table><thead><tr><th>Product</th><th>In stock</th><th>Alert at</th></tr></thead><tbody id="dashLowRows"></tbody></table></div>
 <h3>Recent activity</h3>
 <div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Type</th><th>Item</th><th>Details</th></tr></thead><tbody id="dashActivity"></tbody></table></div>
@@ -366,7 +388,48 @@ function render(){
  document.getElementById('repSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
  document.getElementById('repPurchases').textContent=money(state.purchases.reduce((a,p)=>a+p.total,0));
  document.getElementById('repMargin').textContent=money(state.sales.reduce((a,s)=>a+(s.price-s.cost)*s.qty,0));
- fillSelects();fillSupplierList();updatePreview();
+ renderDashboardExtras();fillSelects();fillSupplierList();updatePreview();
+}
+function renderDashboardExtras(){
+ const hour=new Date().getHours();
+ const part=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+ const who=currentUser?`, <strong>${esc(currentUser.username)}</strong>`:'';
+ const today=new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ document.getElementById('greet').innerHTML=`${part}${who} · ${today}`;
+ document.getElementById('dashStock').textContent=money(state.products.reduce((a,p)=>a+p.qty*p.cost,0));
+ document.getElementById('salesChart').innerHTML=salesSvg();
+ renderCategoryBars();
+}
+function lastSevenDays(){
+ const days=[];const now=new Date();
+ for(let i=6;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push({start:d.getTime(),end:d.getTime()+86400000,label:d.toLocaleDateString(undefined,{weekday:'short'}),total:0});}
+ return days;
+}
+function salesSvg(){
+ const days=lastSevenDays();
+ state.sales.forEach(s=>{if(!s.ts)return;const d=days.find(x=>s.ts>=x.start&&s.ts<x.end);if(d)d.total+=s.total;});
+ const total=days.reduce((a,d)=>a+d.total,0);
+ document.getElementById('salesTotal').textContent=total?`${money(total)} sold this week`:'No sales in the last 7 days yet.';
+ if(!total)return '<div class="empty-chart">Your sales chart will appear here once you record sales.</div>';
+ const W=700,H=220,pad=34,base=H-28,max=Math.max(...days.map(d=>d.total),1),bw=(W-pad*2)/7;
+ let grid='';
+ for(let g=0;g<=3;g++){const y=base-(g/3)*(base-18);grid+=`<line x1="${pad-6}" x2="${W-pad+6}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(160,185,230,.12)" stroke-dasharray="4 6"/>`;}
+ let bars='';
+ days.forEach((d,i)=>{
+  const h=Math.max(2,(d.total/max)*(base-18)),x=pad+i*bw+bw*0.18,w=bw*0.64,y=base-h,cx=(x+w/2).toFixed(1);
+  bars+=`<g><rect class="bar" style="animation-delay:${i*70}ms" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="8" fill="url(#barGrad)"><title>${esc(d.label)}: ${money(d.total)}</title></rect>`
+   +`<text x="${cx}" y="${H-6}" text-anchor="middle" fill="#8e9bb8" font-size="12">${esc(d.label)}</text>`
+   +(d.total?`<text x="${cx}" y="${(y-7).toFixed(1)}" text-anchor="middle" fill="#ffe08a" font-size="11" font-weight="700">${Math.round(d.total).toLocaleString('en-US')}</text>`:'')+`</g>`;
+ });
+ return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales for the last 7 days"><defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd76a"/><stop offset="1" stop-color="#e0a526" stop-opacity=".35"/></linearGradient></defs>${grid}${bars}</svg>`;
+}
+function renderCategoryBars(){
+ const map={};
+ state.products.forEach(p=>{const k=p.category||'Uncategorised';map[k]=(map[k]||0)+p.qty*p.cost;});
+ const rows=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ const max=Math.max(...rows.map(r=>r[1]),1);
+ document.getElementById('catBars').innerHTML=rows.map(([name,val])=>`<div class="cat-row"><span class="cat-name" title="${esc(name)}">${esc(name)}</span><span class="cat-track"><span class="cat-fill" data-w="${(val/max*100).toFixed(1)}"></span></span><span class="cat-val">${money(val)}</span></div>`).join('')||'<div class="empty-chart">Add products with categories to see stock value here.</div>';
+ requestAnimationFrame(()=>document.querySelectorAll('.cat-fill').forEach(el=>{el.style.width=el.dataset.w+'%';}));
 }
 function updatePreview(){const p=state.products.find(x=>x.id===document.getElementById('sProduct').value);const q=Number(document.getElementById('sQty').value||0);document.getElementById('salePreview').textContent=p?`Total: ${money(p.price*q)} · Available: ${p.qty} ${p.unit}`:'Add a product first.';}
 function printReceipt(receiptId){
