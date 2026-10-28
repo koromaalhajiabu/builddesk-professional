@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="./icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 
 <title>BuildDesk Professional</title>
 <style>
@@ -168,14 +169,15 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 </head>
 <body>
 <header><div class="brand"><div class="logo" id="brandLogo">BD</div><div><h1 id="brandShopName">BuildDesk Professional</h1><p>Building materials &amp; hardware shop management</p></div></div></header>
-<div class="top-actions"><button class="btn small secondary" id="pwBtn" type="button" style="margin-right:8px">Change password</button><button class="btn small" id="logoutBtn" type="button">Log out</button></div>
+<div class="top-actions"><button class="btn small" id="installBtn" type="button" style="margin-right:8px;display:none">Install app</button><button class="btn small secondary" id="pwBtn" type="button" style="margin-right:8px">Change password</button><button class="btn small" id="logoutBtn" type="button">Log out</button></div>
 <section id="loginScreen" class="auth-wrap">
  <div class="auth-card"><h2>Sign in to BuildDesk</h2><p class="muted">Log in with an administrator or staff account to continue. This login works offline on this device.</p>
  <form id="loginForm"><div class="field"><label for="loginUser">Username</label><input id="loginUser" name="username" autocomplete="username" required value=""></div>
  <div class="field"><label for="loginPass">Password</label><input id="loginPass" name="password" type="password" autocomplete="current-password" required></div>
  <button class="btn" type="submit">Log in</button><p id="loginError" class="auth-error" aria-live="polite"></p></form>
  <p class="muted"><strong>First-time setup:</strong> username <code>admin</code>, temporary password <code>1234</code>. You will be asked to choose a new password when you first sign in.</p>
- <p class="muted">Pilot note: records are kept in this browser on this device. Anyone with access to this device or browser can see them.</p></div>
+ <p class="muted">Pilot note: records are kept in this browser on this device. Anyone with access to this device or browser can see them.</p>
+ <p class="muted hidden" id="iosHint"><strong>On iPhone:</strong> open this page in Safari, tap the Share button, then choose “Add to Home Screen”.</p></div>
 </section>
 <main id="appMain" class="hidden">
 <div class="notice"><strong>Pilot version:</strong> Your records are stored on this device only. Download a backup from the Backup tab every week and keep it safe. If the browser data is cleared, the records cannot be recovered without a backup.</div>
@@ -652,6 +654,18 @@ document.getElementById('accountPwForm').addEventListener('submit',async e=>{
 document.getElementById('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser)return;const old=document.getElementById('oldPassword').value,newPass=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;const user=auth.users.find(u=>u.username===currentUser.username);if(!user||user.passwordHash!==await passwordHash(old)){document.getElementById('passwordStatus').textContent='Current password is incorrect.';return;}if(newPass.length<4){document.getElementById('passwordStatus').textContent='Use at least 4 characters for the new password.';return;}if(newPass!==confirm){document.getElementById('passwordStatus').textContent='The new passwords do not match.';return;}user.passwordHash=await passwordHash(newPass);user.mustChangePassword=false;persistAuth();document.getElementById('passwordForm').reset();document.getElementById('passwordStatus').textContent='Password updated successfully.';});
 document.getElementById('staffForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser||currentUser.role!=='admin')return;const username=document.getElementById('staffUsername').value.trim(),password=document.getElementById('staffPassword').value;if(username.length<3){document.getElementById('staffStatus').textContent='Username must be at least 3 characters.';return;}if(password.length<4){document.getElementById('staffStatus').textContent='Password must be at least 4 characters.';return;}if(auth.users.some(u=>u.username.toLowerCase()===username.toLowerCase())){document.getElementById('staffStatus').textContent='That username already exists.';return;}auth.users.push({username,role:'staff',passwordHash:await passwordHash(password),mustChangePassword:true});persistAuth();e.target.reset();document.getElementById('staffStatus').textContent='Staff account created. Share the login details privately.';renderAdmin();});
 document.getElementById('staffRows').addEventListener('click',e=>{const b=e.target.closest('[data-delete-user]');if(!b||!currentUser||currentUser.role!=='admin')return;const username=b.dataset.deleteUser;if(!confirm('Delete staff account '+username+'?'))return;auth.users=auth.users.filter(u=>!(u.username===username&&u.role==='staff'));persistAuth();renderAdmin();});
+let deferredInstall=null;
+const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(!isStandalone)document.getElementById('installBtn').style.display='inline-block';});
+document.getElementById('installBtn').addEventListener('click',async()=>{
+ if(!deferredInstall)return;
+ deferredInstall.prompt();
+ await deferredInstall.userChoice;
+ deferredInstall=null;
+ document.getElementById('installBtn').style.display='none';
+});
+window.addEventListener('appinstalled',()=>{deferredInstall=null;document.getElementById('installBtn').style.display='none';});
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!isStandalone)document.getElementById('iosHint').classList.remove('hidden');
 (async()=>{loadSettings();await initAuth();load();render();logout();})();
 </script>
 
