@@ -7,7 +7,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="icon" href="./icon-192.png" type="image/png">
 
 <title>BuildDesk Professional</title>
 <style>
@@ -25,6 +25,7 @@ main{max-width:1100px;margin:18px auto;padding:0 14px 32px}
 .tabs button.active{background:var(--navy);color:white;border-color:var(--navy)}
 .panel{display:none;background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 18px #16345a0b}
 .panel.active{display:block}.panel h2{margin:0 0 14px;font-size:20px}
+.panel h3{font-size:16px;margin:18px 0 6px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .stat{border:1px solid var(--line);border-radius:12px;padding:14px}.stat small{display:block;color:var(--muted);margin-bottom:7px}.stat strong{font-size:24px}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-weight:700;font-size:13px}
@@ -34,9 +35,10 @@ main{max-width:1100px;margin:18px auto;padding:0 14px 32px}
 .btn.secondary{background:#e9f1fb;color:var(--navy)}.btn.small{padding:7px 10px;font-size:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .tablewrap{overflow:auto;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:560px}
-th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px;font-size:13px}
+th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px;font-size:13px;vertical-align:top}
 th{color:var(--muted);background:#f8fafc}.muted{color:var(--muted);font-size:13px}
 .pill{display:inline-block;border-radius:999px;background:#e7f7ee;color:#11683b;padding:3px 8px;font-size:11px;font-weight:800}
+.pill.out{background:#fdecea;color:#b42318}.pill.adj{background:#fff7df;color:#8a5a00}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
 .auth-wrap{max-width:460px;margin:28px auto;padding:0 14px 28px}.auth-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 28px #16345a10}.auth-card h2{margin:0 0 8px}.auth-card .muted{line-height:1.5}.auth-error{color:#b42318;font-size:13px;margin:8px 0}.top-actions{max-width:1100px;margin:0 auto;display:flex;justify-content:flex-end;padding:0 16px 10px}.top-actions button{display:none}.hidden{display:none!important}
 @media(max-width:600px){.brand h1{font-size:20px}.panel{padding:13px}.stat strong{font-size:21px}}
@@ -56,57 +58,104 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
 <main id="appMain" class="hidden">
 <div class="notice"><strong>Starter test build:</strong> This is a local prototype for fictional data only. Data is stored in this browser on this device. It is not yet secure cloud software; do not use real customer or business records.</div>
 <div class="tabs" id="tabs">
-<button class="active" data-tab="dashboard">Dashboard</button><button data-tab="products">Stock / Products</button><button data-tab="sales">Sales &amp; Receipts</button><button data-tab="purchases">Purchases</button><button data-tab="customers">Customer Credit</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup</button><button data-tab="administrator" id="adminTab" class="hidden">Administrator</button>
+<button class="active" data-tab="dashboard">Dashboard</button><button data-tab="products">Stock / Products</button><button data-tab="suppliers">Suppliers</button><button data-tab="sales">Sales &amp; Receipts</button><button data-tab="purchases">Purchases</button><button data-tab="activity">Activity</button><button data-tab="customers">Customer Credit</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup</button><button data-tab="administrator" id="adminTab" class="hidden">Administrator</button>
 </div>
+
 <section id="dashboard" class="panel active">
 <h2>Business overview</h2><div class="grid">
 <div class="stat"><small>Today's recorded sales</small><strong id="dashSales">SLE 0.00</strong></div>
 <div class="stat"><small>Products in catalogue</small><strong id="dashProducts">0</strong></div>
 <div class="stat"><small>Low-stock items</small><strong id="dashLow">0</strong></div>
 <div class="stat"><small>Outstanding customer credit</small><strong id="dashCredit">SLE 0.00</strong></div>
-</div><p class="muted">Use the tabs to add test products, record a sale, enter purchases, and inspect your local backup.</p>
+</div>
+<h3>Low-stock items</h3>
+<div class="tablewrap"><table><thead><tr><th>Product</th><th>In stock</th><th>Alert at</th></tr></thead><tbody id="dashLowRows"></tbody></table></div>
+<h3>Recent activity</h3>
+<div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Type</th><th>Item</th><th>Details</th></tr></thead><tbody id="dashActivity"></tbody></table></div>
+<p class="muted">Use the tabs to manage products and suppliers, record sales and purchases, and check the full activity log.</p>
 </section>
+
 <section id="products" class="panel"><h2>Stock / Products</h2>
-<form id="productForm"><div class="formgrid">
-<div class="field"><label>Product name</label><input id="pName" required placeholder="e.g. Cement 50kg"></div>
-<div class="field"><label>Category</label><input id="pCategory" placeholder="e.g. Cement"></div>
-<div class="field"><label>Unit</label><select id="pUnit"><option>bag</option><option>piece</option><option>length</option><option>sheet</option><option>tin</option><option>box</option><option>kg</option><option>litre</option><option>other</option></select></div>
-<div class="field"><label>Cost per unit (SLE)</label><input id="pCost" type="number" min="0" step="0.01" required></div>
-<div class="field"><label>Selling price (SLE)</label><input id="pPrice" type="number" min="0" step="0.01" required></div>
-<div class="field"><label>Opening stock quantity</label><input id="pQty" type="number" min="0" step="0.01" required></div>
-<div class="field"><label>Low-stock alert threshold</label><input id="pMin" type="number" min="0" step="0.01" value="5"></div>
-</div><button class="btn">Add product</button></form>
-<div class="tablewrap"><table><thead><tr><th>Product</th><th>Unit</th><th>Cost</th><th>Price</th><th>In stock</th><th>Status</th></tr></thead><tbody id="productRows"></tbody></table></div>
+<form id="productForm"><input type="hidden" id="pEditId"><div class="formgrid">
+<div class="field"><label for="pName">Product name</label><input id="pName" required placeholder="e.g. Cement 50kg"></div>
+<div class="field"><label for="pCategory">Category</label><input id="pCategory" placeholder="e.g. Cement"></div>
+<div class="field"><label for="pUnit">Unit</label><select id="pUnit"><option>bag</option><option>piece</option><option>length</option><option>sheet</option><option>tin</option><option>box</option><option>kg</option><option>litre</option><option>other</option></select></div>
+<div class="field"><label for="pCost">Cost per unit (SLE)</label><input id="pCost" type="number" min="0" step="0.01" required></div>
+<div class="field"><label for="pPrice">Selling price (SLE)</label><input id="pPrice" type="number" min="0" step="0.01" required></div>
+<div class="field"><label for="pQty">Opening stock quantity</label><input id="pQty" type="number" min="0" step="0.01" required></div>
+<div class="field"><label for="pMin">Low-stock alert threshold</label><input id="pMin" type="number" min="0" step="0.01" value="5"></div>
+</div>
+<div class="actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn secondary hidden" id="productCancel" type="button">Cancel edit</button></div>
+<p class="muted">To change stock levels, use Adjust on a product, or record a purchase or sale. Editing a product does not change its quantity.</p>
+</form>
+<div class="formgrid" style="margin-top:14px">
+<div class="field"><label for="stockSearch">Search products</label><input id="stockSearch" placeholder="Search name or category"></div>
+<div class="field"><label>&nbsp;</label><button class="btn secondary" id="lowOnly" type="button" aria-pressed="false">Low stock only</button></div>
+</div>
+<p class="muted" id="stockCount"></p>
+<div class="tablewrap"><table><thead><tr><th>Product</th><th>Unit</th><th>Cost</th><th>Price</th><th>In stock</th><th>Status</th><th>Actions</th></tr></thead><tbody id="productRows"></tbody></table></div>
 </section>
+
+<section id="suppliers" class="panel"><h2>Suppliers</h2>
+<form id="supplierForm"><input type="hidden" id="sEditId"><div class="formgrid">
+<div class="field"><label for="sName">Supplier name</label><input id="sName" required placeholder="e.g. Peninsula Timber"></div>
+<div class="field"><label for="sContact">Contact person</label><input id="sContact" placeholder="e.g. Aminata Sesay"></div>
+<div class="field"><label for="sPhone">Phone</label><input id="sPhone" placeholder="e.g. +232 77 000 000"></div>
+<div class="field"><label for="sEmail">Email</label><input id="sEmail" type="email" placeholder="e.g. orders@example.com"></div>
+<div class="field"><label for="sLocation">Location</label><input id="sLocation" placeholder="e.g. Waterloo"></div>
+</div>
+<div class="actions"><button class="btn" id="supplierSubmit" type="submit">Add supplier</button><button class="btn secondary hidden" id="supplierCancel" type="button">Cancel edit</button></div>
+</form>
+<div class="field" style="margin-top:14px"><label for="supplierSearch">Search suppliers</label><input id="supplierSearch" placeholder="Search name, contact or location"></div>
+<p class="muted" id="supplierCount"></p>
+<div class="tablewrap"><table><thead><tr><th>Supplier</th><th>Contact</th><th>Phone</th><th>Email</th><th>Location</th><th>Purchases</th><th>Actions</th></tr></thead><tbody id="supplierRows"></tbody></table></div>
+</section>
+
 <section id="sales" class="panel"><h2>Record a sale</h2>
 <form id="saleForm"><div class="formgrid">
-<div class="field"><label>Product</label><select id="sProduct" required></select></div>
-<div class="field"><label>Quantity</label><input id="sQty" type="number" min="0.01" step="0.01" required value="1"></div>
-<div class="field"><label>Payment type</label><select id="sPayment"><option>Cash</option><option>Credit</option><option>Mobile money</option><option>Bank transfer</option></select></div>
-<div class="field"><label>Customer (optional)</label><input id="sCustomer" placeholder="Fictional customer"></div>
-</div><p class="muted" id="salePreview">Choose a product to see the total.</p><button class="btn">Save test sale</button></form>
+<div class="field"><label for="sProduct">Product</label><select id="sProduct" required></select></div>
+<div class="field"><label for="sQty">Quantity</label><input id="sQty" type="number" min="0.01" step="0.01" required value="1"></div>
+<div class="field"><label for="sPayment">Payment type</label><select id="sPayment"><option>Cash</option><option>Credit</option><option>Mobile money</option><option>Bank transfer</option></select></div>
+<div class="field"><label for="sCustomer">Customer (optional)</label><input id="sCustomer" placeholder="Customer name"></div>
+</div><p class="muted" id="salePreview">Choose a product to see the total.</p><button class="btn">Save sale</button></form>
 <div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Receipt</th><th>Product</th><th>Qty</th><th>Total</th><th>Payment</th><th>Receipt actions</th></tr></thead><tbody id="saleRows"></tbody></table></div>
 <p class="muted">Tap “Print / Save PDF” beside a recorded sale. In Android's print screen, select “Save as PDF” to save a PDF copy.</p>
 </section>
+
 <section id="purchases" class="panel"><h2>Record a purchase / stock receipt</h2>
 <form id="purchaseForm"><div class="formgrid">
-<div class="field"><label>Product</label><select id="buyProduct" required></select></div>
-<div class="field"><label>Quantity received</label><input id="buyQty" type="number" min="0.01" step="0.01" required></div>
-<div class="field"><label>Supplier</label><input id="buySupplier" required placeholder="Fictional supplier"></div>
-<div class="field"><label>Unit cost (SLE)</label><input id="buyCost" type="number" min="0" step="0.01" required></div>
+<div class="field"><label for="buyProduct">Product</label><select id="buyProduct" required></select></div>
+<div class="field"><label for="buyQty">Quantity received</label><input id="buyQty" type="number" min="0.01" step="0.01" required></div>
+<div class="field"><label for="buySupplier">Supplier</label><input id="buySupplier" required list="supplierList" placeholder="Pick or type a supplier"><datalist id="supplierList"></datalist></div>
+<div class="field"><label for="buyCost">Unit cost (SLE)</label><input id="buyCost" type="number" min="0" step="0.01" required></div>
 </div><button class="btn">Record purchase</button></form>
 <div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Product</th><th>Qty</th><th>Supplier</th><th>Total cost</th></tr></thead><tbody id="purchaseRows"></tbody></table></div>
 </section>
+
+<section id="activity" class="panel"><h2>Activity</h2>
+<p class="muted">Every stock receipt, sale, and adjustment in one timeline, newest first.</p>
+<div class="actions" id="activityFilters">
+<button class="btn" type="button" data-act-filter="all">All</button>
+<button class="btn secondary" type="button" data-act-filter="in">Stock in</button>
+<button class="btn secondary" type="button" data-act-filter="out">Stock out</button>
+<button class="btn secondary" type="button" data-act-filter="adjust">Adjustments</button>
+</div>
+<div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Type</th><th>Item</th><th>Qty change</th><th>Details</th></tr></thead><tbody id="activityRows"></tbody></table></div>
+</section>
+
 <section id="customers" class="panel"><h2>Customer credit</h2><p class="muted">Credit sales are tracked from sales marked “Credit”. This starter does not yet include repayments or customer account statements.</p>
 <div class="tablewrap"><table><thead><tr><th>Customer</th><th>Receipt</th><th>Product</th><th>Outstanding</th></tr></thead><tbody id="creditRows"></tbody></table></div>
 </section>
+
 <section id="reports" class="panel"><h2>Basic reports</h2><div class="grid">
 <div class="stat"><small>Total recorded sales</small><strong id="repSales">SLE 0.00</strong></div>
 <div class="stat"><small>Recorded purchase cost</small><strong id="repPurchases">SLE 0.00</strong></div>
 <div class="stat"><small>Estimated gross margin on sales*</small><strong id="repMargin">SLE 0.00</strong></div>
 </div><p class="muted">*Prototype estimate using the product's current unit cost; not an audited profit/loss or inventory valuation. Returns, tax, expenses, and cost changes are not fully modelled.</p>
 </section>
-<section id="backup" class="panel"><h2>Backup / Restore</h2><p>Export a JSON copy of this device's products, sales, and purchases. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn" type="button">Download JSON backup</button><button class="btn secondary" id="checkBtn" type="button">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><section class="stat" style="margin-top:12px"><h3>Restore from JSON backup</h3><p class="muted">Choose a BuildDesk JSON backup file. Restoring replaces the current products, sales, and purchases on this device. Staff accounts and shop settings are not changed.</p><div class="field"><label for="restoreFile">Select JSON backup file</label><input id="restoreFile" type="file" accept=".json,application/json"></div><button class="btn secondary" id="restoreBtn" type="button">Restore backup</button><p id="restoreStatus" class="muted" aria-live="polite"></p></section></section>
+
+<section id="backup" class="panel"><h2>Backup / Restore</h2><p>Export a JSON copy of this device's products, suppliers, sales, purchases, and stock adjustments. Keep it private and store a second copy somewhere safe.</p><div class="actions"><button class="btn" id="exportBtn" type="button">Download JSON backup</button><button class="btn secondary" id="checkBtn" type="button">Check local data</button></div><p id="backupStatus" class="muted" aria-live="polite"></p><section class="stat" style="margin-top:12px"><h3>Restore from JSON backup</h3><p class="muted">Choose a BuildDesk JSON backup file. Restoring replaces the current products, suppliers, sales, purchases, and adjustments on this device. Staff accounts and shop settings are not changed.</p><div class="field"><label for="restoreFile">Select JSON backup file</label><input id="restoreFile" type="file" accept=".json,application/json"></div><button class="btn secondary" id="restoreBtn" type="button">Restore backup</button><p id="restoreStatus" class="muted" aria-live="polite"></p></section></section>
+
 <section id="administrator" class="panel"><h2>Administrator dashboard</h2>
 <p class="muted">Manage your shop identity, staff access, and administrator password. Changes are saved in this browser on this device.</p>
 <form id="shopSettingsForm" class="stat" style="margin-bottom:16px"><h3 style="margin-top:0">Shop name and business identity</h3><div class="field"><label for="shopNameInput">Shop / business name</label><input id="shopNameInput" maxlength="80" required placeholder="e.g. Abu Koroma Building Materials & Hardware"></div><p class="muted">This name appears at the top of the app and on printed receipts. It does not change your saved sales or product records.</p><button class="btn" type="submit">Save shop name</button><p id="shopNameStatus" class="muted" aria-live="polite"></p></form>
@@ -118,15 +167,18 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
 <p class="muted">Staff accounts can use the business screens but cannot open this Administrator section. The administrator account cannot be deleted.</p>
 </section>
 </main>
- <footer>Designed by Alhaji Abu Koroma</footer>
+<footer>Designed by Alhaji Abu Koroma</footer>
 <script>
 const KEY='builddesk_professional_starter_v1';
 const AUTH_KEY='builddesk_professional_auth_v1';
 const SETTINGS_KEY='builddesk_professional_settings_v1';
 let settings={shopName:'BuildDesk Professional'};
-let state={products:[],sales:[],purchases:[]};
+let state={products:[],sales:[],purchases:[],suppliers:[],adjustments:[]};
 let auth={users:[]};
 let currentUser=null;
+let lowOnlyOn=false;
+let activityFilter='all';
+const uid=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
 async function passwordHash(value){
  const bytes=new TextEncoder().encode(String(value));
  if(window.crypto&&crypto.subtle){const digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -148,23 +200,68 @@ function renderAdmin(){if(!currentUser)return;document.getElementById('currentAc
 
 const money=n=>'SLE '+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.products)&&Array.isArray(parsed.sales)&&Array.isArray(parsed.purchases))state=parsed;}}catch(e){}}
+const isLow=p=>p.qty<=p.min;
+const typeLabel={in:'Stock in',out:'Stock out',adjust:'Adjustment'};
+function load(){
+ try{const raw=localStorage.getItem(KEY);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.products)&&Array.isArray(parsed.sales)&&Array.isArray(parsed.purchases))state=parsed;}}catch(e){}
+ // Older saves do not have suppliers or adjustments yet.
+ if(!Array.isArray(state.suppliers))state.suppliers=[];
+ if(!Array.isArray(state.adjustments))state.adjustments=[];
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
 function dt(){return new Date().toLocaleString();}
 function fillSelects(){const opts=state.products.map(p=>`<option value="${p.id}">${esc(p.name)} (${p.qty} ${esc(p.unit)} available)</option>`).join('');['sProduct','buyProduct'].forEach(id=>{const el=document.getElementById(id);const old=el.value;el.innerHTML=opts||'<option value="">Add a product first</option>';if(state.products.some(p=>p.id===old))el.value=old;});}
+function fillSupplierList(){document.getElementById('supplierList').innerHTML=state.suppliers.map(s=>`<option value="${esc(s.name)}"></option>`).join('');}
+
+function activityItems(){
+ const items=[];
+ state.purchases.forEach(p=>items.push({ts:p.ts||0,date:p.date,type:'in',item:p.productName,qty:p.qty,unit:'',detail:`From ${p.supplier||'unknown supplier'} · cost ${money(p.total)}`}));
+ state.sales.forEach(s=>items.push({ts:s.ts||0,date:s.date,type:'out',item:s.productName,qty:s.qty,unit:'',detail:`Receipt ${s.receipt} · ${s.customer||'Walk-in customer'} · ${s.payment}`}));
+ state.adjustments.forEach(a=>items.push({ts:a.ts||0,date:a.date,type:'adjust',item:a.productName,qty:a.to-a.from,unit:a.unit||'',detail:`${a.from} → ${a.to} ${a.unit||''} · ${a.reason||'Adjustment'}`}));
+ return items.sort((a,b)=>b.ts-a.ts);
+}
+function qtyText(a){if(a.type==='out')return '−'+a.qty;if(a.type==='in')return '+'+a.qty;return (a.qty>0?'+':'')+a.qty;}
+
+function renderProducts(){
+ const q=document.getElementById('stockSearch').value.trim().toLowerCase();
+ let list=state.products.filter(p=>!q||(p.name+' '+(p.category||'')).toLowerCase().includes(q));
+ if(lowOnlyOn)list=list.filter(isLow);
+ document.getElementById('productRows').innerHTML=list.map(p=>`<tr><td>${esc(p.name)}<br><span class="muted">${esc(p.category)}</span></td><td>${esc(p.unit)}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td>${p.qty}</td><td>${isLow(p)?'<span style="color:#b42318;font-weight:700">Low stock</span>':'<span class="pill">In stock</span>'}</td><td><div class="actions"><button type="button" class="btn small secondary" data-adjust="${esc(p.id)}">Adjust</button><button type="button" class="btn small secondary" data-edit="${esc(p.id)}">Edit</button><button type="button" class="btn small secondary" data-delete="${esc(p.id)}">Delete</button></div></td></tr>`).join('')||'<tr><td colspan="7">No matching products.</td></tr>';
+ document.getElementById('stockCount').textContent=`${list.length} of ${state.products.length} products shown`;
+}
+function renderSuppliers(){
+ const q=document.getElementById('supplierSearch').value.trim().toLowerCase();
+ const list=state.suppliers.filter(s=>!q||[s.name,s.contact,s.location].join(' ').toLowerCase().includes(q));
+ document.getElementById('supplierRows').innerHTML=list.map(s=>{
+  const count=state.purchases.filter(p=>(p.supplier||'').toLowerCase()===s.name.toLowerCase()).length;
+  return `<tr><td><strong>${esc(s.name)}</strong></td><td>${esc(s.contact)}</td><td>${esc(s.phone)}</td><td>${esc(s.email)}</td><td>${esc(s.location)}</td><td>${count}</td><td><div class="actions"><button type="button" class="btn small secondary" data-edit-supplier="${esc(s.id)}">Edit</button><button type="button" class="btn small secondary" data-delete-supplier="${esc(s.id)}">Delete</button></div></td></tr>`;
+ }).join('')||'<tr><td colspan="7">No suppliers yet. Add one above.</td></tr>';
+ document.getElementById('supplierCount').textContent=`${list.length} of ${state.suppliers.length} suppliers shown`;
+}
+function renderActivity(){
+ const list=activityItems().filter(a=>activityFilter==='all'||a.type===activityFilter);
+ document.getElementById('activityRows').innerHTML=list.map(a=>`<tr><td>${esc(a.date)}</td><td><span class="pill ${a.type==='out'?'out':a.type==='adjust'?'adj':''}">${typeLabel[a.type]}</span></td><td>${esc(a.item)}</td><td>${qtyText(a)} ${esc(a.unit)}</td><td>${esc(a.detail)}</td></tr>`).join('')||'<tr><td colspan="5">No movements recorded yet. Stock in, stock out, and adjustments will appear here.</td></tr>';
+ document.querySelectorAll('[data-act-filter]').forEach(b=>{const on=b.dataset.actFilter===activityFilter;b.classList.toggle('secondary',!on);});
+}
+
 function render(){
-document.getElementById('dashSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
-document.getElementById('dashProducts').textContent=state.products.length;
-document.getElementById('dashLow').textContent=state.products.filter(p=>p.qty<=p.min).length;
-document.getElementById('dashCredit').textContent=money(state.sales.filter(s=>s.payment==='Credit').reduce((a,s)=>a+s.total,0));
-document.getElementById('productRows').innerHTML=state.products.map(p=>`<tr><td>${esc(p.name)}<br><span class="muted">${esc(p.category)}</span></td><td>${esc(p.unit)}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td>${p.qty}</td><td>${p.qty<=p.min?'<span style="color:#b42318;font-weight:700">Low stock</span>':'<span class="pill">In stock</span>'}</td></tr>`).join('')||'<tr><td colspan="6">No products yet. Add a fictional product to begin.</td></tr>';
-document.getElementById('saleRows').innerHTML=[...state.sales].reverse().map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${esc(s.payment)}</td><td><button type="button" class="btn small" data-receipt="${esc(s.receipt)}">Print / Save PDF</button></td></tr>`).join('')||'<tr><td colspan="7">No sales recorded yet.</td></tr>';
-document.getElementById('purchaseRows').innerHTML=[...state.purchases].reverse().map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.productName)}</td><td>${p.qty}</td><td>${esc(p.supplier)}</td><td>${money(p.total)}</td></tr>`).join('')||'<tr><td colspan="5">No purchases recorded yet.</td></tr>';
-document.getElementById('creditRows').innerHTML=state.sales.filter(s=>s.payment==='Credit').map(s=>`<tr><td>${esc(s.customer||'Unspecified customer')}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${money(s.total)}</td></tr>`).join('')||'<tr><td colspan="4">No credit sales recorded.</td></tr>';
-document.getElementById('repSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
-document.getElementById('repPurchases').textContent=money(state.purchases.reduce((a,p)=>a+p.total,0));
-document.getElementById('repMargin').textContent=money(state.sales.reduce((a,s)=>a+(s.price-s.cost)*s.qty,0));
-fillSelects();updatePreview();
+ const low=state.products.filter(isLow);
+ document.getElementById('dashSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
+ document.getElementById('dashProducts').textContent=state.products.length;
+ document.getElementById('dashLow').textContent=low.length;
+ document.getElementById('dashCredit').textContent=money(state.sales.filter(s=>s.payment==='Credit').reduce((a,s)=>a+s.total,0));
+ document.getElementById('dashLowRows').innerHTML=low.map(p=>`<tr><td>${esc(p.name)}</td><td>${p.qty} ${esc(p.unit)}</td><td>${p.min}</td></tr>`).join('')||'<tr><td colspan="3">No low-stock items.</td></tr>';
+ document.getElementById('dashActivity').innerHTML=activityItems().slice(0,5).map(a=>`<tr><td>${esc(a.date)}</td><td>${typeLabel[a.type]}</td><td>${esc(a.item)}</td><td>${esc(a.detail)}</td></tr>`).join('')||'<tr><td colspan="4">No activity yet.</td></tr>';
+ renderProducts();
+ renderSuppliers();
+ renderActivity();
+ document.getElementById('saleRows').innerHTML=[...state.sales].reverse().map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${esc(s.payment)}</td><td><button type="button" class="btn small" data-receipt="${esc(s.receipt)}">Print / Save PDF</button></td></tr>`).join('')||'<tr><td colspan="7">No sales recorded yet.</td></tr>';
+ document.getElementById('purchaseRows').innerHTML=[...state.purchases].reverse().map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.productName)}</td><td>${p.qty}</td><td>${esc(p.supplier)}</td><td>${money(p.total)}</td></tr>`).join('')||'<tr><td colspan="5">No purchases recorded yet.</td></tr>';
+ document.getElementById('creditRows').innerHTML=state.sales.filter(s=>s.payment==='Credit').map(s=>`<tr><td>${esc(s.customer||'Unspecified customer')}</td><td>${esc(s.receipt)}</td><td>${esc(s.productName)}</td><td>${money(s.total)}</td></tr>`).join('')||'<tr><td colspan="4">No credit sales recorded.</td></tr>';
+ document.getElementById('repSales').textContent=money(state.sales.reduce((a,s)=>a+s.total,0));
+ document.getElementById('repPurchases').textContent=money(state.purchases.reduce((a,p)=>a+p.total,0));
+ document.getElementById('repMargin').textContent=money(state.sales.reduce((a,s)=>a+(s.price-s.cost)*s.qty,0));
+ fillSelects();fillSupplierList();updatePreview();
 }
 function updatePreview(){const p=state.products.find(x=>x.id===document.getElementById('sProduct').value);const q=Number(document.getElementById('sQty').value||0);document.getElementById('salePreview').textContent=p?`Total: ${money(p.price*q)} · Available: ${p.qty} ${p.unit}`:'Add a product first.';}
 function printReceipt(receiptId){
@@ -196,14 +293,123 @@ function printReceipt(receiptId){
 </body></html>`);
  w.document.close();w.focus();
 }
+
+function resetProductForm(){
+ document.getElementById('productForm').reset();
+ document.getElementById('pEditId').value='';
+ document.getElementById('pMin').value=5;
+ document.getElementById('pQty').disabled=false;
+ document.getElementById('productSubmit').textContent='Add product';
+ document.getElementById('productCancel').classList.add('hidden');
+}
+function startEditProduct(id){
+ const p=state.products.find(x=>x.id===id);if(!p)return;
+ document.getElementById('pEditId').value=p.id;
+ document.getElementById('pName').value=p.name;
+ document.getElementById('pCategory').value=p.category||'';
+ document.getElementById('pUnit').value=p.unit;
+ document.getElementById('pCost').value=p.cost;
+ document.getElementById('pPrice').value=p.price;
+ document.getElementById('pQty').value=p.qty;
+ document.getElementById('pQty').disabled=true;
+ document.getElementById('pMin').value=p.min;
+ document.getElementById('productSubmit').textContent='Save changes';
+ document.getElementById('productCancel').classList.remove('hidden');
+ activateTab('products');
+ document.getElementById('pName').focus();
+}
+function resetSupplierForm(){
+ document.getElementById('supplierForm').reset();
+ document.getElementById('sEditId').value='';
+ document.getElementById('supplierSubmit').textContent='Add supplier';
+ document.getElementById('supplierCancel').classList.add('hidden');
+}
+function startEditSupplier(id){
+ const s=state.suppliers.find(x=>x.id===id);if(!s)return;
+ document.getElementById('sEditId').value=s.id;
+ document.getElementById('sName').value=s.name;
+ document.getElementById('sContact').value=s.contact||'';
+ document.getElementById('sPhone').value=s.phone||'';
+ document.getElementById('sEmail').value=s.email||'';
+ document.getElementById('sLocation').value=s.location||'';
+ document.getElementById('supplierSubmit').textContent='Save changes';
+ document.getElementById('supplierCancel').classList.remove('hidden');
+ activateTab('suppliers');
+ document.getElementById('sName').focus();
+}
+
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='administrator'&&(!currentUser||currentUser.role!=='admin'))return;activateTab(b.dataset.tab);}));
-document.getElementById('productForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('pName').value.trim();if(!name)return;state.products.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,category:document.getElementById('pCategory').value.trim(),unit:document.getElementById('pUnit').value,cost:Number(document.getElementById('pCost').value),price:Number(document.getElementById('pPrice').value),qty:Number(document.getElementById('pQty').value),min:Number(document.getElementById('pMin').value||0)});e.target.reset();document.getElementById('pMin').value=5;save();});
-document.getElementById('saleForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('sProduct').value),qty=Number(document.getElementById('sQty').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}if(qty>p.qty){alert('Not enough stock for this sale.');return;}const s={date:dt(),receipt:'BD-'+Date.now().toString().slice(-8),productId:p.id,productName:p.name,qty,price:p.price,cost:p.cost,total:qty*p.price,payment:document.getElementById('sPayment').value,customer:document.getElementById('sCustomer').value.trim()};p.qty-=qty;state.sales.push(s);save();e.target.reset();document.getElementById('sQty').value=1;alert('Sale recorded successfully. Receipt number: '+s.receipt+'. To print or save as PDF, use the Print / Save PDF button in the sales list.');});
-document.getElementById('saleRows').addEventListener('click',e=>{const b=e.target.closest('[data-receipt]');if(b)printReceipt(b.dataset.receipt);});
-document.getElementById('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('buyProduct').value),qty=Number(document.getElementById('buyQty').value),cost=Number(document.getElementById('buyCost').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}p.qty+=qty;p.cost=cost;state.purchases.push({date:dt(),productId:p.id,productName:p.name,qty,supplier:document.getElementById('buySupplier').value.trim(),unitCost:cost,total:qty*cost});e.target.reset();save();});
+
+document.getElementById('productForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=document.getElementById('pName').value.trim();if(!name)return;
+ const editId=document.getElementById('pEditId').value;
+ const data={name,category:document.getElementById('pCategory').value.trim(),unit:document.getElementById('pUnit').value,cost:Number(document.getElementById('pCost').value),price:Number(document.getElementById('pPrice').value),min:Number(document.getElementById('pMin').value||0)};
+ if(editId){const p=state.products.find(x=>x.id===editId);if(p)Object.assign(p,data);}
+ else{state.products.push({id:uid(),...data,qty:Number(document.getElementById('pQty').value)});}
+ resetProductForm();save();
+});
+document.getElementById('productCancel').addEventListener('click',resetProductForm);
+document.getElementById('stockSearch').addEventListener('input',renderProducts);
+document.getElementById('lowOnly').addEventListener('click',e=>{lowOnlyOn=!lowOnlyOn;e.currentTarget.setAttribute('aria-pressed',String(lowOnlyOn));e.currentTarget.classList.toggle('secondary',!lowOnlyOn);renderProducts();});
+document.getElementById('productRows').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.edit){startEditProduct(b.dataset.edit);return;}
+ if(b.dataset.delete){
+  const p=state.products.find(x=>x.id===b.dataset.delete);if(!p)return;
+  if(!confirm(`Delete "${p.name}"? Past sales and purchases keep their records.`))return;
+  state.products=state.products.filter(x=>x.id!==p.id);
+  if(document.getElementById('pEditId').value===p.id)resetProductForm();
+  save();return;
+ }
+ if(b.dataset.adjust){
+  const p=state.products.find(x=>x.id===b.dataset.adjust);if(!p)return;
+  const input=prompt(`Counted quantity for ${p.name} (currently ${p.qty} ${p.unit}):`,String(p.qty));
+  if(input===null)return;
+  const to=Number(input);
+  if(input.trim()===''||!isFinite(to)||to<0){alert('Enter a valid quantity of 0 or more.');return;}
+  if(to===p.qty)return;
+  const reason=(prompt('Reason for adjustment (e.g. damaged, recount):','Stock count')||'').trim()||'Adjustment';
+  state.adjustments.push({ts:Date.now(),date:dt(),productId:p.id,productName:p.name,unit:p.unit,from:p.qty,to,reason});
+  p.qty=to;save();
+ }
+});
+
+document.getElementById('supplierForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=document.getElementById('sName').value.trim();
+ if(!name){alert('Enter a supplier name.');return;}
+ const editId=document.getElementById('sEditId').value;
+ if(state.suppliers.some(s=>s.name.toLowerCase()===name.toLowerCase()&&s.id!==editId)){alert('A supplier with this name already exists.');return;}
+ const data={name,contact:document.getElementById('sContact').value.trim(),phone:document.getElementById('sPhone').value.trim(),email:document.getElementById('sEmail').value.trim(),location:document.getElementById('sLocation').value.trim()};
+ if(editId){const s=state.suppliers.find(x=>x.id===editId);if(s)Object.assign(s,data);}
+ else{state.suppliers.push({id:uid(),...data});}
+ resetSupplierForm();save();
+});
+document.getElementById('supplierCancel').addEventListener('click',resetSupplierForm);
+document.getElementById('supplierSearch').addEventListener('input',renderSuppliers);
+document.getElementById('supplierRows').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.editSupplier){startEditSupplier(b.dataset.editSupplier);return;}
+ if(b.dataset.deleteSupplier){
+  const s=state.suppliers.find(x=>x.id===b.dataset.deleteSupplier);if(!s)return;
+  if(!confirm(`Delete supplier "${s.name}"? Past purchases keep their supplier name.`))return;
+  state.suppliers=state.suppliers.filter(x=>x.id!==s.id);
+  if(document.getElementById('sEditId').value===s.id)resetSupplierForm();
+  save();
+ }
+});
+
+document.getElementById('activityFilters').addEventListener('click',e=>{const b=e.target.closest('[data-act-filter]');if(!b)return;activityFilter=b.dataset.actFilter;renderActivity();});
+
+document.getElementById('saleForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('sProduct').value),qty=Number(document.getElementById('sQty').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}if(qty>p.qty){alert('Not enough stock for this sale.');return;}const s={ts:Date.now(),date:dt(),receipt:'BD-'+Date.now().toString().slice(-8),productId:p.id,productName:p.name,qty,price:p.price,cost:p.cost,total:qty*p.price,payment:document.getElementById('sPayment').value,customer:document.getElementById('sCustomer').value.trim()};p.qty-=qty;state.sales.push(s);save();e.target.reset();document.getElementById('sQty').value=1;alert('Sale recorded successfully. Receipt number: '+s.receipt+'. To print or save as PDF, use the Print / Save PDF button in the sales list.');});
 document.getElementById('sProduct').addEventListener('change',updatePreview);document.getElementById('sQty').addEventListener('input',updatePreview);
+document.getElementById('saleRows').addEventListener('click',e=>{const b=e.target.closest('[data-receipt]');if(b)printReceipt(b.dataset.receipt);});
+
+document.getElementById('purchaseForm').addEventListener('submit',e=>{e.preventDefault();const p=state.products.find(x=>x.id===document.getElementById('buyProduct').value),qty=Number(document.getElementById('buyQty').value),cost=Number(document.getElementById('buyCost').value);if(!p||qty<=0){alert('Add a product and enter a valid quantity.');return;}p.qty+=qty;p.cost=cost;state.purchases.push({ts:Date.now(),date:dt(),productId:p.id,productName:p.name,qty,supplier:document.getElementById('buySupplier').value.trim(),unitCost:cost,total:qty*cost});e.target.reset();save();});
+
 document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'BuildDesk Professional Starter',exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='BuildDesk-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);document.getElementById('backupStatus').textContent='Backup export requested. Check Downloads and confirm the file is non-empty.';});
-document.getElementById('checkBtn').addEventListener('click',()=>{document.getElementById('backupStatus').textContent=`Local data check: ${state.products.length} products, ${state.sales.length} sales, ${state.purchases.length} purchases. This checks the current browser data only.`;});
+document.getElementById('checkBtn').addEventListener('click',()=>{document.getElementById('backupStatus').textContent=`Local data check: ${state.products.length} products, ${state.suppliers.length} suppliers, ${state.sales.length} sales, ${state.purchases.length} purchases, ${state.adjustments.length} adjustments. This checks the current browser data only.`;});
 
 document.getElementById('restoreBtn').addEventListener('click',()=>{
  const file=document.getElementById('restoreFile').files[0];
@@ -217,10 +423,10 @@ document.getElementById('restoreBtn').addEventListener('click',()=>{
    if(!data||!Array.isArray(data.products)||!Array.isArray(data.sales)||!Array.isArray(data.purchases)){
     status.textContent='This file is not a valid BuildDesk backup. No data was changed.';return;
    }
-   if(!confirm('Restore this backup? Current products, sales, and purchases on this device will be replaced. Staff accounts and shop settings will not change.'))return;
-   state={products:data.products,sales:data.sales,purchases:data.purchases};
+   if(!confirm('Restore this backup? Current products, suppliers, sales, purchases, and adjustments on this device will be replaced. Staff accounts and shop settings will not change.'))return;
+   state={products:data.products,sales:data.sales,purchases:data.purchases,suppliers:Array.isArray(data.suppliers)?data.suppliers:[],adjustments:Array.isArray(data.adjustments)?data.adjustments:[]};
    save();
-   status.textContent='Backup restored successfully. Products: '+state.products.length+', sales: '+state.sales.length+', purchases: '+state.purchases.length+'.';
+   status.textContent='Backup restored successfully. Products: '+state.products.length+', suppliers: '+state.suppliers.length+', sales: '+state.sales.length+', purchases: '+state.purchases.length+'.';
   }catch(err){status.textContent='Could not read this backup file. No data was changed.';}
  };
  reader.onerror=()=>{status.textContent='Could not read the selected file. No data was changed.';};
