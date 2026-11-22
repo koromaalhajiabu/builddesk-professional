@@ -1,4 +1,4 @@
-const CACHE_NAME = 'builddesk-professional-v7';
+const CACHE_NAME = 'builddesk-professional-v8';
 const APP_SHELL = [
   './',
   './index.html',
