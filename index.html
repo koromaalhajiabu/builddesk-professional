@@ -168,7 +168,7 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo" id="brandLogo">BD</div><div><h1 id="brandShopName">BuildDesk Professional</h1><p>Building materials &amp; hardware shop management</p></div></div></header>
+<header><div class="brand"><div class="logo" id="brandLogo">BD</div><div><h1 id="brandShopName">BuildDesk Professional</h1><p>Building materials &amp; hardware shop management · DEMO DATA ONLY — fictional sample records</p></div></div></header>
 <div class="top-actions"><button class="btn small" id="installBtn" type="button" style="margin-right:8px;display:none">Install app</button><button class="btn small secondary" id="pwBtn" type="button" style="margin-right:8px">Change password</button><button class="btn small" id="logoutBtn" type="button">Log out</button></div>
 <section id="loginScreen" class="auth-wrap">
  <div class="auth-card"><h2>Sign in to BuildDesk</h2><p class="muted">Log in with an administrator or staff account to continue. This login works offline on this device.</p>
@@ -181,7 +181,7 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
  <p class="muted hidden" id="iosHint"><strong>On iPhone:</strong> open this page in Safari, tap the Share button, then choose “Add to Home Screen”.</p></div>
 </section>
 <main id="appMain" class="hidden">
-<div class="notice"><strong>Pilot version:</strong> Your records are stored on this device only. Download a backup from the Backup tab every week and keep it safe. If the browser data is cleared, the records cannot be recovered without a backup.</div>
+<div class="notice"><strong>DEMONSTRATION DATA ONLY:</strong> This fresh-install dataset contains fictional sample products, suppliers, sales and purchases. Figures and names are illustrative, not real business records. Your records remain stored on this device; export a backup regularly.</div>
 <div class="notice hidden" id="backupReminder"></div>
 <div class="tabs" id="tabs">
 <button class="active" data-tab="dashboard">Dashboard</button><button data-tab="products">Stock / Products</button><button data-tab="suppliers">Suppliers</button><button data-tab="sales">Sales &amp; Receipts</button><button data-tab="purchases">Purchases</button><button data-tab="activity">Activity</button><button data-tab="customers">Customer Credit</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup</button><button data-tab="administrator" id="adminTab" class="hidden">Administrator</button>
@@ -344,6 +344,44 @@ function load(){
  // Older saves do not have suppliers or adjustments yet.
  if(!Array.isArray(state.suppliers))state.suppliers=[];
  if(!Array.isArray(state.adjustments))state.adjustments=[];
+ // Add a one-time fictional sample catalogue only on a pristine browser.
+ // Existing local business data is never replaced or mixed with these records.
+ const demoMarker='builddesk_demo_seed_v1';
+ if(localStorage.getItem(demoMarker)!=='1'){
+  const pristine=!state.products.length&&!state.sales.length&&!state.purchases.length&&!state.suppliers.length&&!state.adjustments.length;
+  if(pristine){
+   state={
+    products:[
+     {id:'DEMO-BD-P001',name:'DEMO — Cement 50kg Bag',category:'Building Materials',unit:'bag',cost:90,price:115,min:20,qty:170},
+     {id:'DEMO-BD-P002',name:'DEMO — 12mm Reinforcement Bar',category:'Steel',unit:'length',cost:150,price:185,min:10,qty:85},
+     {id:'DEMO-BD-P003',name:'DEMO — Roofing Sheet 12ft',category:'Roofing',unit:'sheet',cost:170,price:220,min:8,qty:62},
+     {id:'DEMO-BD-P004',name:'DEMO — PVC Pipe 1 inch',category:'Plumbing',unit:'length',cost:40,price:55,min:10,qty:70},
+     {id:'DEMO-BD-P005',name:'DEMO — Interior Paint 20L',category:'Paint & Finishes',unit:'bucket',cost:330,price:410,min:5,qty:33}
+    ],
+    suppliers:[
+     {id:'DEMO-BD-S001',name:'DEMO — Western Building Supplies',contact:'Demo Contact',phone:'DEMO ONLY — no real phone',email:'supplier1.demo@example.test',location:'Freetown, Sierra Leone'},
+     {id:'DEMO-BD-S002',name:'DEMO — Peninsula Hardware Distributors',contact:'Demo Contact',phone:'DEMO ONLY — no real phone',email:'supplier2.demo@example.test',location:'Western Area, Sierra Leone'}
+    ],
+    sales:[
+     {ts:Date.parse('2026-11-22T08:30:00Z'),date:'22 Nov 2026, 08:30',receipt:'DEMO-BD-REC-001',productId:'DEMO-BD-P001',productName:'DEMO — Cement 50kg Bag',qty:5,price:115,cost:90,total:575,payment:'Cash',customer:'DEMO — Walk-in Customer'},
+     {ts:Date.parse('2026-11-22T09:15:00Z'),date:'22 Nov 2026, 09:15',receipt:'DEMO-BD-REC-002',productId:'DEMO-BD-P002',productName:'DEMO — 12mm Reinforcement Bar',qty:10,price:185,cost:150,total:1850,payment:'Mobile Money',customer:'DEMO — Peninsula Builders'},
+     {ts:Date.parse('2026-11-22T10:05:00Z'),date:'22 Nov 2026, 10:05',receipt:'DEMO-BD-REC-003',productId:'DEMO-BD-P003',productName:'DEMO — Roofing Sheet 12ft',qty:4,price:220,cost:170,total:880,payment:'Cash',customer:'DEMO — Home Renovation Customer'},
+     {ts:Date.parse('2026-11-21T11:20:00Z'),date:'21 Nov 2026, 11:20',receipt:'DEMO-BD-REC-004',productId:'DEMO-BD-P004',productName:'DEMO — PVC Pipe 1 inch',qty:10,price:55,cost:40,total:550,payment:'Cash',customer:'DEMO — Walk-in Customer'},
+     {ts:Date.parse('2026-11-20T14:10:00Z'),date:'20 Nov 2026, 14:10',receipt:'DEMO-BD-REC-005',productId:'DEMO-BD-P005',productName:'DEMO — Interior Paint 20L',qty:2,price:410,cost:330,total:820,payment:'Cash',customer:'DEMO — Renovation Team'}
+    ],
+    purchases:[
+     {ts:Date.parse('2026-11-10T10:00:00Z'),date:'10 Nov 2026, 10:00',productId:'DEMO-BD-P001',productName:'DEMO — Cement 50kg Bag',qty:80,supplier:'DEMO — Western Building Supplies',unitCost:90,total:7200},
+     {ts:Date.parse('2026-11-11T10:00:00Z'),date:'11 Nov 2026, 10:00',productId:'DEMO-BD-P002',productName:'DEMO — 12mm Reinforcement Bar',qty:50,supplier:'DEMO — Peninsula Hardware Distributors',unitCost:150,total:7500},
+     {ts:Date.parse('2026-11-12T10:00:00Z'),date:'12 Nov 2026, 10:00',productId:'DEMO-BD-P003',productName:'DEMO — Roofing Sheet 12ft',qty:30,supplier:'DEMO — Western Building Supplies',unitCost:170,total:5100},
+     {ts:Date.parse('2026-11-13T10:00:00Z'),date:'13 Nov 2026, 10:00',productId:'DEMO-BD-P004',productName:'DEMO — PVC Pipe 1 inch',qty:40,supplier:'DEMO — Peninsula Hardware Distributors',unitCost:40,total:1600},
+     {ts:Date.parse('2026-11-14T10:00:00Z'),date:'14 Nov 2026, 10:00',productId:'DEMO-BD-P005',productName:'DEMO — Interior Paint 20L',qty:15,supplier:'DEMO — Western Building Supplies',unitCost:330,total:4950}
+    ],
+    adjustments:[]
+   };
+   try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  }
+  try{localStorage.setItem(demoMarker,'1');}catch(e){}
+ }
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
 function dt(){return new Date().toLocaleString();}
