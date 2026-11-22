@@ -166,6 +166,30 @@ code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:6px;font-siz
 @media(max-width:600px){.brand h1{font-size:19px}.panel{padding:16px;border-radius:16px}.stat strong{font-size:22px}.logo{font-size:18px;padding:8px 11px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<style id="klt-dashboard-premium-v3">
+:root{--klt-gold:#f3c75c;--klt-blue:#5fa8ff;--klt-panel:rgba(17,31,56,.88)}
+body{background:radial-gradient(1000px 650px at 88% -10%,rgba(79,140,255,.28),transparent 59%),radial-gradient(800px 520px at -10% 10%,rgba(245,192,74,.17),transparent 65%),linear-gradient(180deg,#0a1428 0%,#060b17 100%)!important}
+header{background:rgba(7,15,31,.82)!important;backdrop-filter:blur(18px)!important;box-shadow:0 12px 35px #0005!important;border-bottom:1px solid #ffffff16!important}
+main{max-width:1320px!important;padding-top:28px!important}
+#dashboard.panel{padding:clamp(20px,3vw,32px)!important;border-radius:25px!important;background:linear-gradient(145deg,rgba(22,39,68,.94),rgba(10,20,38,.96))!important;border:1px solid rgba(137,176,231,.23)!important;box-shadow:0 25px 75px rgba(0,0,0,.35),inset 0 1px 0 #ffffff12!important}
+#dashboard h2{font-size:clamp(24px,4vw,34px)!important;letter-spacing:-.04em!important;background:linear-gradient(90deg,#fff,#f8d77e);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#greet{color:#b9c9e3!important;font-size:14px!important}
+.tabs{background:rgba(255,255,255,.045)!important;border:1px solid rgba(160,185,230,.17)!important;border-radius:17px!important;padding:7px!important;backdrop-filter:blur(12px)!important}
+.tabs button{border-radius:12px!important;padding:11px 15px!important}
+.tabs button.active{background:linear-gradient(130deg,#ffd76a,#df9f24)!important;color:#1b1b19!important;box-shadow:0 9px 24px rgba(245,192,74,.3)!important}
+#dashboard .grid{gap:14px!important;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))!important;margin:20px 0 24px!important}
+#dashboard .stat{min-height:128px!important;padding:20px!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025))!important;border:1px solid rgba(155,188,233,.2)!important;box-shadow:0 14px 30px #0002!important}
+#dashboard .stat small{color:#b4c4df!important;font-size:11px!important;letter-spacing:.08em;text-transform:uppercase}
+#dashboard .stat strong{display:block;margin-top:12px;font-size:clamp(25px,3.5vw,34px)!important;color:#ffe08a!important;font-weight:850!important}
+.chart-grid{gap:15px!important}
+.chart-card{border-radius:19px!important;background:rgba(6,14,29,.48)!important;border:1px solid rgba(160,185,230,.18)!important;padding:19px!important;box-shadow:inset 0 1px 0 #ffffff08!important}
+.chart-card h3{color:#edf4ff!important}
+#dashboard h3{color:#f1f5ff!important}
+.tablewrap{border:1px solid rgba(160,185,230,.18)!important;border-radius:16px!important;background:rgba(5,12,25,.36)!important}
+#dashboard table tbody tr:hover{background:rgba(245,192,74,.08)!important}
+button,.btn{border-radius:12px!important}
+</style>
+<meta name="klt-dashboard-version" content="2026-11-22-premium-v3">
 </head>
 <body>
 <header><div class="brand"><div class="logo" id="brandLogo">BD</div><div><h1 id="brandShopName">BuildDesk Professional</h1><p>Building materials &amp; hardware shop management · DEMO DATA ONLY — fictional sample records</p></div></div></header>
@@ -710,7 +734,7 @@ if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!isStandalone)document.getElem
 
 <script>
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline support registration failed:', err)));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=9').catch(err => console.warn('Offline support registration failed:', err)));
 }
 </script>
 </body></html>
